@@ -1,0 +1,20 @@
+%YAML:1.0
+
+##### IMU parameters (for test or traj)
+imu_frequency: 200 # frequency
+imu_step: 0.005 # time_step
+acc_b: 0.0 # initial bias of acc (m/s^2)
+gyr_b: 0.0 # initial bias of gyr (rad/s)
+acc_n: 0.0 # accelerometer noise standard deviation/density (m/s^2) * (1/sqrt(Hz))
+gyr_n: 0.0 # gyroscope noise standard deviation/density (rad/s) * (1/sqrt(Hz))
+acc_w: 0.0 # accelerometer bias random walker standard deviation (m/s^3) * (1/sqrt(Hz))
+gyr_w: 0.0 # gyroscope bias random walker standard deviation (rad/s^2) * (1/sqrt(Hz))
+# ##### IMU parameters (MTI-700)
+# imu_frequency: 200 # frequency
+# imu_step: 0.005 # time_step
+# acc_b: 2.91e-3 # initial bias of acc (m/s^2)
+# gyr_b: 4.86e-4 # initial bias of gyr (rad/s)
+# acc_n: 0.00088 # accelerometer noise standard deviation/density (m/s^2) * (1/sqrt(Hz))
+# gyr_n: 0.000224 # gyroscope noise standard deviation/density (rad/s) * (1/sqrt(Hz))
+# acc_w: 2.1e-5 # accelerometer bias random walker standard deviation (m/s^3) * (1/sqrt(Hz))
+# gyr_w: 5.0e-6 # gyroscope bias random walker standard deviation (rad/s^2) * (1/sqrt(Hz))
