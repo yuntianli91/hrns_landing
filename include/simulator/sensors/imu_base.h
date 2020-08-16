@@ -34,6 +34,7 @@ struct ImuMotionData{
     Eigen::Vector3d tnb_; // translation from b-frame to w-frame, e.g., posotion in w-frame;
     Eigen::Matrix3d Rnb_; // rotation transform from b-fram to w-frame
     Eigen::Quaterniond qnb_; // quaternion rotate w-frame to b-frame (q^w_b = R^w_b但前者表示w->q的旋转，后者表示b->w的坐标变换)
+    Eigen::Vector3d eulerAngles_; // sequence 2-1-0
 
     Eigen::Vector3d acc_; // linear acceleration
     Eigen::Vector3d vel_; // linear velocity

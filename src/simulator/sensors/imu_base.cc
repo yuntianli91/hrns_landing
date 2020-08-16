@@ -33,6 +33,7 @@ void IMU_BASE::oneStepPropagate(ImuMotionData &data){
     if(first_flag_){
         tnb_ = data.tnb_; vel_ = data.vel_;
         qnb_ = data.qnb_;
+        pos_ = data.pos_;
         cout << "Integration type: " << intType << endl;
         first_flag_ = false;
     }
@@ -42,7 +43,9 @@ void IMU_BASE::oneStepPropagate(ImuMotionData &data){
     // construct
     data.tnb_ = tnb_; data.vel_ = vel_; 
     data.qnb_ = qnb_; data.Rnb_ = qnb_.toRotationMatrix();
-    
+    data.eulerAngles_ = data.Rnb_.eulerAngles(2, 1, 0);
+    data.pos_ = pos_;
+
     data.acc_ = acc_1_; data.gyr_ = gyr_1_;
     data.acc_bias_ = acc_bias_; 
     data.gyr_bias_ = gyr_bias_;

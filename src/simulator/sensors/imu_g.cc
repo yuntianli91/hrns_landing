@@ -68,6 +68,7 @@ void IMU_G::oneStepIntegration(){
         tnb_.x() += time_step_ * vel0.x() / h_m; //latitude
         tnb_.y() += time_step_ * vel0.y() / (h_m * cos(curLat)); //longitude
         tnb_.z() += -time_step_ * vel0.z(); // height
+        pos_ += vel0 * time_step_ + 0.5 * acc_n * time_step_ * time_step_;
     } 
 
 }
@@ -114,15 +115,17 @@ vector<ImuMotionData> IMU_G::trajGenerator(ImuMotionData initPose, vector<Vec3d>
         tmp_data.tnb_ = Vec3d(lat, lon, alt);
         tmp_data.vel_ = v_g;
         tmp_data.qnb_ = qnb;
+        tmp_data.eulerAngles_ = qnb.matrix().eulerAngles(2, 1, 0);
         tmp_data.acc_ = acc_b;
         tmp_data.gyr_ = gyr_b;
         tmp_data.pos_ = pos_g;
 
         traj_data.push_back(tmp_data);
         // ----- propagate trajectory
+        Eigen::Quaterniond qnb0 = qnb;
         Eigen::Quaterniond dq(1., 0.5 * w_gb.x() * time_step_, 0.5 * w_gb.y() * time_step_, 0.5 * w_gb.z() * time_step_);
         dq.normalize();
-        qnb = qnb * dq;
+        qnb = qnb0 * dq;
         qnb.normalize();
 
         lon += time_step_ * v_g.y() / (h_m * cos(lat)); //longitude
