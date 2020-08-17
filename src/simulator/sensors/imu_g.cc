@@ -53,7 +53,7 @@ void IMU_G::oneStepIntegration(){
         Eigen::Quaterniond dq(1., 0.5 * w_gb.x() * time_step_, 0.5 * w_gb.y() * time_step_, 0.5 * w_gb.z() * time_step_);
         dq.normalize();
         qnb_ = qnb0 * dq;
-        // qnb_.normalize();
+        qnb_.normalize();
 
         // compute gravity
         Eigen::Vector3d gn = Vec3d::Zero(); // gravity vector

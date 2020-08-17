@@ -300,7 +300,7 @@ fig5.savefig('att.pdf', format='pdf')
 fig6, axis = plt.subplots(1,1)
 
 axis.plot(ned_data[:,3], ned_data[:,1])
-# axis.plot(ned_data_imu[:,2], ned_data_imu[:,1])
+axis.plot(ned_data_imu[:,3], ned_data_imu[:,1])
 axis.grid()
 axis.set_xlabel("East(km)")
 axis.set_ylabel("North(km)")
@@ -315,28 +315,28 @@ axis.grid()
 
 fig7.savefig('da.pdf', format='pdf')
 # plt.axis('equal')
-# ###### figure 8 #######
-fig8, axes = plt.subplots(3,1)
+# # ###### figure 8 #######
+# fig8, axes = plt.subplots(3,1)
 
-axes[0].plot(time_series, ned_data[:,1] - ned_data_imu[:,1]);
+# axes[0].plot(time_series, ned_data[:,1] - ned_data_imu[:,1]);
 
-axes[1].plot(time_series, ned_data[:,2] - ned_data_imu[:,2]);
+# axes[1].plot(time_series, ned_data[:,2] - ned_data_imu[:,2]);
 
-axes[2].plot(time_series, pos[:,2] - pos_imu[:,2]);
+# axes[2].plot(time_series, pos[:,2] - pos_imu[:,2]);
 
-######### figure 9 #######
-fig9, axes = plt.subplots(4,1)
-axes[0].plot(time_series, quat[:,0])
-axes[0].plot(time_series, quat_imu[:,0])
+# ######### figure 9 #######
+# fig9, axes = plt.subplots(4,1)
+# axes[0].plot(time_series, quat[:,0])
+# axes[0].plot(time_series, quat_imu[:,0])
 
-axes[1].plot(time_series, quat[:,1])
-axes[1].plot(time_series, quat_imu[:,1])
+# axes[1].plot(time_series, quat[:,1])
+# axes[1].plot(time_series, quat_imu[:,1])
 
-axes[2].plot(time_series, quat[:,2])
-axes[2].plot(time_series, quat_imu[:,2])
+# axes[2].plot(time_series, quat[:,2])
+# axes[2].plot(time_series, quat_imu[:,2])
 
-axes[3].plot(time_series, quat[:,3])
-axes[3].plot(time_series, quat_imu[:,3])
+# axes[3].plot(time_series, quat[:,3])
+# axes[3].plot(time_series, quat_imu[:,3])
 
 
 ##显示绘图
