@@ -43,7 +43,15 @@ void IMU_BASE::oneStepPropagate(ImuMotionData &data){
     // construct
     data.tnb_ = tnb_; data.vel_ = vel_; 
     data.qnb_ = qnb_; data.Rnb_ = qnb_.toRotationMatrix();
-    data.eulerAngles_ = data.Rnb_.eulerAngles(2, 1, 0);
+    Vec3d tmp_euler = AttUtility::R2Euler(data.Rnb_);
+    // Vec3d tmp_euler = data.Rnb_.eulerAngles(2, 0, 1);
+    // // if euler angle is very close to 180, set it to 0
+    // for (int i = 0; i < 3; i++){
+    //     if(abs(tmp_euler(i)) > 179.9)
+    //         tmp_euler(i) = 0;
+    // }
+    data.eulerAngles_ = tmp_euler;
+
     data.pos_ = pos_;
 
     data.acc_ = acc_1_; data.gyr_ = gyr_1_;

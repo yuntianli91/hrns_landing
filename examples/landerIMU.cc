@@ -48,17 +48,17 @@ void cvModel(){
     traj_data = mtiIMU.trajGenerator(initPose, a_g_all, w_g_all);
 
     writeImuMotionData("../data/cvGeo.csv", traj_data);
-    writePosNED("../data/posNED.csv", traj_data);
+    writePosNUE("../data/posNED.csv", traj_data);
 }
 
 void landModel(){
     ImuMotionData initPose;
-    initPose.tnb_ = Vec3d(0., 0., 20000);
+    initPose.tnb_ = Vec3d(0., 20000, 0.); // lat, alt, lon
     initPose.vel_ = Vec3d(1690, 0., 0.);
     initPose.time_stamp_ = 0.;
 
     double theta = -8.5 / 180. * M_PI;
-    Eigen::AngleAxisd r_vec(theta, Vec3d(0., 1., 0.));
+    Eigen::AngleAxisd r_vec(theta, Vec3d(0., 0., 1.));
     initPose.qnb_ = Eigen::Quaterniond(r_vec);
     
     double cur_a = 2.6658;
@@ -81,7 +81,7 @@ void landModel(){
     double w_ad = 2.5 / 180. * M_PI;
     for(int i = 0; i < N; i++){
         a_b_all.emplace_back(Vec3d( -cur_a, 0., 0.));
-        w_g_all.emplace_back(Vec3d(0., -w_ad, 0.));
+        w_g_all.emplace_back(Vec3d(0., 0., -w_ad));
     }
 
     // vertical approaching
@@ -98,7 +98,7 @@ void landModel(){
     N = 200 * time;
 
     for(int i = 0; i < N; i++){
-        a_b_all.emplace_back(Vec3d(-1.622, -0.6, 0.5));
+        a_b_all.emplace_back(Vec3d(-1.622, 0.5, -0.6));
         w_g_all.emplace_back(Vec3d(0., 0., 0.));
     }
     
@@ -106,7 +106,7 @@ void landModel(){
     N = 200 * time;
 
     for(int i = 0; i < N; i++){
-        a_b_all.emplace_back(Vec3d(-1.622, 0.6, 0.5));
+        a_b_all.emplace_back(Vec3d(-1.622, 0.5, 0.6));
         w_g_all.emplace_back(Vec3d(0., 0., 0.));
     }
     // finla approaching
@@ -133,7 +133,7 @@ void landModel(){
     traj_data = mtiIMU.trajGenerator(initPose, a_b_all, w_g_all);
 
     writeImuMotionData("../data/caGeo.csv", traj_data);
-    writePosNED("../data/posNED.csv", traj_data);
+    writePosNUE("../data/posNED.csv", traj_data);
 
     
     // test imu integration
@@ -145,7 +145,7 @@ void landModel(){
     }
 
     writeImuMotionData("../data/caGeoImu.csv", imu_data);
-    writePosNED("../data/posNEDImu.csv", imu_data);
+    writePosNUE("../data/posNEDImu.csv", imu_data);
 }
 
 int main(int argc, char** argv){

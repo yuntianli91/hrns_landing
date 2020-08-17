@@ -2,6 +2,7 @@
 #define IMU_BASE_H_
 
 #include "commonHeaders.h"
+#include "utilities/utilities.hpp"
 
 using namespace std;
 

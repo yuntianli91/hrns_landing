@@ -59,7 +59,7 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
         tmp.tnb_ = Vec3d(px, py, pz);
         tmp.vel_ = Vec3d(vx, vy, vz);
         tmp.qnb_ = Qd(qw, qx, qy, qz);
-        tmp.eulerAngles_ = Vec3d(roll, pitch, yaw);
+        tmp.eulerAngles_ = Vec3d(roll, yaw, pitch);
         tmp.acc_ = Vec3d(ax, ay, az);
         tmp.gyr_ = Vec3d(wx, wy, wz);
 
@@ -80,7 +80,7 @@ void writeImuMotionData(string filename, vector<ImuMotionData> &imu_data){
         return;
     }
 
-    fprintf(fp, "# time_stamp[s], p_RS_R_x[m], p_RS_R_y[m], p_RS_R_z[m], q_RS_w[], q_RS_x[], q_RS_y[], q_RS_z[], Roll[deg], Pitch[deg], Yaw[deg],"); 
+    fprintf(fp, "# time_stamp[s], p_RS_R_x[m], p_RS_R_y[m], p_RS_R_z[m], q_RS_w[], q_RS_x[], q_RS_y[], q_RS_z[], Roll[deg], Yaw[deg], Pitch[deg],"); 
     fprintf(fp, "v_R_x[m/s], v_R_y[m/s], v_R_z[m/s], gyr_S_x[rad/s], gyr_S_y[rad/s], gyr_S_z[rad/s], acc_S_x[m/s^2], acc_S_y[m/s^2], acc_S_z[m/s^2]\n"); 
 
     for (auto it:imu_data){
@@ -96,7 +96,7 @@ void writeImuMotionData(string filename, vector<ImuMotionData> &imu_data){
     }
 }
 
-void writePosNED(string filename, vector<ImuMotionData> &imu_data){
+void writePosNUE(string filename, vector<ImuMotionData> &imu_data){
     FILE *fp;
     struct stat buffer;
     if(stat(filename.c_str(), &buffer) == 0)
@@ -108,7 +108,7 @@ void writePosNED(string filename, vector<ImuMotionData> &imu_data){
         return;
     }
 
-    fprintf(fp, "# time_stamp[s], p_N[m], p_E[m], p_D[m]\n"); 
+    fprintf(fp, "# time_stamp[s], p_N[m], p_U[m], p_E[m]\n"); 
 
     for (auto it:imu_data){
         fprintf(fp, "%e,%e,%e,%e\n", it.time_stamp_, 
