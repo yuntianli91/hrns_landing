@@ -80,12 +80,13 @@ void writeImuMotionData(string filename, vector<ImuMotionData> &imu_data){
         return;
     }
 
-    fprintf(fp, "# time_stamp[s], p_RS_R_x[m], p_RS_R_y[m], p_RS_R_z[m], q_RS_w[], q_RS_x[], q_RS_y[], q_RS_z[], Roll[deg], Yaw[deg], Pitch[deg],"); 
+    fprintf(fp, "# time_stamp[s], p_RS_R_x[m], p_RS_R_y[m], p_RS_R_z[m], q_RS_w[], q_RS_x[], q_RS_y[], q_RS_z[], Pitch[deg], Yaw[deg], Roll[deg],"); 
     fprintf(fp, "v_R_x[m/s], v_R_y[m/s], v_R_z[m/s], gyr_S_x[rad/s], gyr_S_y[rad/s], gyr_S_z[rad/s], acc_S_x[m/s^2], acc_S_y[m/s^2], acc_S_z[m/s^2]\n"); 
 
     for (auto it:imu_data){
         // fprintf(fp, "%f,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", it.time_stamp_, 
         fprintf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le\n", 
+        // fprintf(fp, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le\n", 
                 it.time_stamp_, 
                 it.tnb_.x(), it.tnb_.y(), it.tnb_.z(),
                 it.qnb_.w(), it.qnb_.x(), it.qnb_.y(), it.qnb_.z(),
@@ -96,7 +97,7 @@ void writeImuMotionData(string filename, vector<ImuMotionData> &imu_data){
     }
 }
 
-void writePosNUE(string filename, vector<ImuMotionData> &imu_data){
+void writePos(string filename, vector<ImuMotionData> &imu_data){
     FILE *fp;
     struct stat buffer;
     if(stat(filename.c_str(), &buffer) == 0)
@@ -108,12 +109,59 @@ void writePosNUE(string filename, vector<ImuMotionData> &imu_data){
         return;
     }
 
-    fprintf(fp, "# time_stamp[s], p_N[m], p_U[m], p_E[m]\n"); 
+    fprintf(fp, "# time_stamp[s], p_N[m], p_U[m], p_E[m], acc_N[m/s^2], acc_N[m/s^2], acc_N[m/s^2]\n"); 
 
     for (auto it:imu_data){
-        fprintf(fp, "%e,%e,%e,%e\n", it.time_stamp_, 
-                        it.pos_.x(), it.pos_.y(), it.pos_.z());     
+        fprintf(fp, "%e,%e,%e,%e,%e,%e,%e\n", it.time_stamp_, 
+                        it.pos_.x(), it.pos_.y(), it.pos_.z(),
+                        it.acc_n_.x(), it.acc_n_.y(), it.acc_n_.z());     
     }
+}
+
+void writeAllanData(string filename, vector<ImuMotionData> &imu_data){
+    FILE *fp;
+    struct stat buffer;
+    if(stat(filename.c_str(), &buffer) == 0)
+        system(("rm " + filename).c_str());    
+    fp = fopen(filename.c_str(), "w+");
+
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << filename << endl;
+        return;
+    }
+
+    fprintf(fp, "#time_stamp[s],acc_x[m/s^2],acc_y[m/s^2],acc_z[m/s^2],gyr_x[rad/s],gyr_y[rad/s],gyr_z[rad/s],\n"); 
+
+    for (auto it:imu_data){
+        fprintf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
+                it.time_stamp_, 
+                it.acc_.x(), it.acc_.y(), it.acc_.z(),
+                it.gyr_.x(), it.gyr_.y(), it.gyr_.z());     
+    }
+
+}
+
+/**
+ * @brief print percentage of progress
+ * 
+ * @param name 
+ * @param per 
+ */
+void printPer(string name, float per){
+    const char symbol[4] = {'|','/','-','\\'};
+    printf("[#][%s][%.2f%%][%c]\r", name.c_str(), per, symbol[(int)per%4]);
+    fflush(stdout);
+}
+/**
+ * @brief print percentage of progress
+ * 
+ * @param name 
+ * @param per 
+ */
+void printPer(string name, int per){
+    const char symbol[4] = {'|','/','-','\\'};
+    printf("[#][%s][%d%%][%c]\r", name.c_str(), per, symbol[(int)per%4]);
+    fflush(stdout);
 }
 
 

@@ -2,6 +2,9 @@
 
 namespace myFusion{
 
+IMU_G::IMU_G(ImuParam params):IMU_BASE(params){
+}
+
 void IMU_G::oneStepIntegration(){
     // NUE - [lat, alt, lon]
     double curLat = tnb_.x(); // current latitude
@@ -91,6 +94,9 @@ vector<ImuMotionData> IMU_G::trajGenerator(ImuMotionData initPose, vector<Vec3d>
     // ============ trajectory generation ============ // 
     vector<ImuMotionData> traj_data;
     for (size_t i = 0; i < a_b_all.size(); i++){
+        int per = (i + 1) * 100 / a_b_all.size();
+        printf("[#][Generating traj data...][%d%%]\r", per);
+        fflush(stdout);
  
         double h_m = R_m + alt; // (R_m + h)
         // ----- compute compensation variables
@@ -119,7 +125,9 @@ vector<ImuMotionData> IMU_G::trajGenerator(ImuMotionData initPose, vector<Vec3d>
         tmp_data.eulerAngles_ = AttUtility::R2Euler(Cnb);
         tmp_data.acc_ = acc_b;
         tmp_data.gyr_ = gyr_b;
+
         tmp_data.pos_ = pos_g;
+        tmp_data.acc_n_ = acc_g;
 
         traj_data.push_back(tmp_data);
         // ----- propagate trajectory

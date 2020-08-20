@@ -48,7 +48,7 @@ void cvModel(){
     traj_data = mtiIMU.trajGenerator(initPose, a_g_all, w_g_all);
 
     writeImuMotionData("../data/cvGeo.csv", traj_data);
-    writePosNUE("../data/posNED.csv", traj_data);
+    writePos("../data/posNED.csv", traj_data);
 }
 
 void landModel(){
@@ -133,19 +133,24 @@ void landModel(){
     traj_data = mtiIMU.trajGenerator(initPose, a_b_all, w_g_all);
 
     writeImuMotionData("../data/caGeo.csv", traj_data);
-    writePosNUE("../data/posNED.csv", traj_data);
+    writePos("../data/posNED.csv", traj_data);
 
     
-    // test imu integration
+    // test imu integration    
     imu_data.clear();
+    int i = 0;
     for(auto it: traj_data){
+        int per = (++i) * 100 / traj_data.size();
+        printf("[#][Generating traj data...][%d%%]\r", per);
+        fflush(stdout);
+
         ImuMotionData tmp_data = it;
         mtiIMU.oneStepPropagate(tmp_data);
         imu_data.emplace_back(tmp_data);
     }
 
     writeImuMotionData("../data/caGeoImu.csv", imu_data);
-    writePosNUE("../data/posNEDImu.csv", imu_data);
+    writePos("../data/posNEDImu.csv", imu_data);
 }
 
 int main(int argc, char** argv){

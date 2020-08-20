@@ -2,9 +2,11 @@
 
 namespace myFusion{
 
-IMU_BASE::IMU_BASE(ImuParam param){
-    setParams(param);
+IMU_BASE::IMU_BASE(ImuParam params){
+    setParams(params);
 }
+
+IMU_BASE::~IMU_BASE(){}
 
 void IMU_BASE::setParams(ImuParam param)
 {
@@ -34,7 +36,7 @@ void IMU_BASE::oneStepPropagate(ImuMotionData &data){
         tnb_ = data.tnb_; vel_ = data.vel_;
         qnb_ = data.qnb_;
         pos_ = data.pos_;
-        cout << "Integration type: " << intType << endl;
+        // cout << "\nIntegration type: " << intType << endl;
         first_flag_ = false;
     }
     else{
@@ -108,6 +110,30 @@ double IMU_BASE::computeG(double h, CELESTIAL body){
         cout << "Wrong celestial type!\n";
         break;
     }
+}
+
+void IMU_BASE::generateAllanData(double t, vector<ImuMotionData> & imu_data){
+    double time_stamp = 0.0;
+
+    imu_data.clear();
+    while(time_stamp <= t){
+        float per = time_stamp / t * 100.;
+        printf("[#][Generating allan data...][%.2f%%]\r", per);
+        fflush(stdout);
+
+        acc_1_ = Eigen::Vector3d::Zero();
+        gyr_1_ = Eigen::Vector3d::Zero();
+
+        addNoise();
+
+        ImuMotionData tmp_data;
+        tmp_data.acc_ = acc_1_;
+        tmp_data.gyr_ = gyr_1_;
+
+        time_stamp += time_step_;
+    }
+
+    
 }
 
 }

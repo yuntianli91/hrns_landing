@@ -7,7 +7,8 @@ namespace myFusion{
 
 class IMU_G:public IMU_BASE{
 public:
-    using IMU_BASE::IMU_BASE;
+    IMU_G(ImuParam params);
+    ~IMU_G(){};
 
     void oneStepIntegration();
 

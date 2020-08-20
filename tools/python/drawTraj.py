@@ -17,7 +17,7 @@ def quat2euler(quat):
     return [roll, pitch, yaw]
 ###################### 读取标称轨迹数据（csv格式） ########################
 traj_data = pd.read_csv('../data/caGeo.csv').values
-imu_data = pd.read_csv('../data/caGeoImu.csv').values
+imu_data = pd.read_csv('../data/caGeo.csv').values
 ned_data = pd.read_csv('../data/posNED.csv').values
 ned_data_imu = pd.read_csv('../data/posNEDImu.csv').values
 # beacon_location = pd.read_csv('/home/yuntian/dataset/simulator/lander/beacon_location.csv').values
@@ -44,8 +44,11 @@ ned_data_imu = ned_data_imu / 1000.
 
 N = len(ned_data[:,0])
 downRange = np.zeros(N)
+downRangeImu = np.zeros(N)
 for i in range(0, N):   
     downRange[i] = math.sqrt(ned_data[i,0] * ned_data[i,0] + ned_data[i,1] * ned_data[i,1])
+    downRangeImu[i] = math.sqrt(ned_data_imu[i,0] * ned_data_imu[i,0] + ned_data_imu[i,1] * ned_data_imu[i,1])
+
 ######################### 画图 #########################
 # 图注使用$$开启数学环境
 ###### figure1 #####
@@ -140,18 +143,24 @@ fig2.savefig('gyr.pdf', format='pdf')
 ##### figure3 #####
 fig3, axes = plt.subplots(3, 1)
 fig3.subplots_adjust(hspace=0.5)
-pos[:,0:2]  = pos[:,0:2] / math.pi * 180.;
-pos[:,2] = pos[:,2] / 1000.;
+pos[:,0]  = pos[:,0] / math.pi * 180.;
+pos[:,1] = pos[:,1] / 1000.;
+pos[:,2]  = pos[:,2] / math.pi * 180.;
 
-pos_imu[:,0:2]  = pos_imu[:,0:2] / math.pi * 180.;
-pos_imu[:,2] = pos_imu[:,2] / 1000.;
+pos_imu[:,0]  = pos_imu[:,0] / math.pi * 180.;
+pos_imu[:,1] = pos_imu[:,1] / 1000.;
+pos_imu[:,2]  = pos[:,2] / math.pi * 180.;
+# pos = pos / 1000.;
+# pos_imu = pos_imu / 1000.;
+
 ## 子图1
 axes[0].plot(time_series, pos[:,0], 'b-')
 axes[0].plot(time_series, pos_imu[:,0], 'r-')
 # axes[0].set_xlim(0, 220)
 # axes[0].set_ylim(-0.1, 0.1)
 axes[0].set_xlabel('$time (s)$')
-axes[0].set_ylabel('$Latitude(deg)$')
+# axes[0].set_ylabel('$Latitude(deg)$')
+axes[0].set_ylabel('$x(km)$')
 
 # x_major_locator = plt.MultipleLocator(25)
 # axes[0].xaxis.set_major_locator(x_major_locator)
@@ -164,7 +173,8 @@ axes[1].plot(time_series, pos_imu[:,2], 'r-')
 # axes[1].set_xlim(0, 220)
 # axes[1].set_ylim(-0.1, 0.1)
 axes[1].set_xlabel('$time (s)$')
-axes[1].set_ylabel('$Logitude (deg)$')
+# axes[1].set_ylabel('$Logitude (deg)$')
+axes[1].set_ylabel('$y(km)$')
 
 # x_major_locator = plt.MultipleLocator(25)
 # axes[1].xaxis.set_major_locator(x_major_locator)
@@ -177,7 +187,8 @@ axes[2].plot(time_series, pos_imu[:,1], 'r-')
 # axes[2].set_xlim(0, 220)
 # axes[2].set_ylim(-0.1, 0.1)
 axes[2].set_xlabel('$time (s)$')
-axes[2].set_ylabel('$Altimeter (km)$')
+# axes[2].set_ylabel('$Altimeter (km)$')
+axes[2].set_ylabel('$z(km)$')
 
 # x_major_locator = plt.MultipleLocator(25)
 # axes[2].xaxis.set_major_locator(x_major_locator)
@@ -261,7 +272,7 @@ axes[0].plot(time_imu, euler_imu[:,0], '-r')
 # axes[0].set_xlim(0, 220)
 # axes[0].set_ylim(-0.1, 0.1)
 axes[0].set_xlabel('$time (s)$')
-axes[0].set_ylabel('$Roll (\deg)$')
+axes[0].set_ylabel('$Pitch (\deg)$')
 
 # x_major_locator = plt.MultipleLocator(25)
 # axes[0].xaxis.set_major_locator(x_major_locator)
@@ -287,7 +298,7 @@ axes[2].plot(time_series, euler_imu[:,2], 'r-')
 # axes[2].set_xlim(0, 220)
 # axes[2].set_ylim(-0.1, 0.1)
 axes[2].set_xlabel('$time (s)$')
-axes[2].set_ylabel('$Pitch (\deg)$')
+axes[2].set_ylabel('$Roll (\deg)$')
 
 # x_major_locator = plt.MultipleLocator(25)
 # axes[2].xaxis.set_major_locator(x_major_locator)
@@ -308,7 +319,8 @@ axis.set_ylabel("North(km)")
 fig6.savefig('ne.pdf', format='pdf')
 ##### figure7 ######
 fig7, axis = plt.subplots(1,1, figsize=(8,4))
-axis.plot(downRange, traj_data[:,2])
+axis.plot(downRange, pos[:,1])
+axis.plot(downRangeImu, pos_imu[:,1])
 axis.set_xlabel("DownRange(km)")
 axis.set_ylabel("Altitude(km)")
 axis.grid()

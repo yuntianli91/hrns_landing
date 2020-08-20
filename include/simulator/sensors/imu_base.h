@@ -44,16 +44,19 @@ struct ImuMotionData{
     Eigen::Vector3d acc_bias_; // accelerometer bias
     Eigen::Vector3d gyr_bias_; // gyroscope bias
 
+    // test variables
     Eigen::Vector3d pos_; // pos in local frame (used in geometric reference frame)
+    Eigen::Vector3d acc_n_;
+    // Eigen::Vector3d gyr_n_;
 };
 
 class IMU_BASE{
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    
-    IMU_BASE() = delete;
-    IMU_BASE(ImuParam param);
-    ~IMU_BASE(){}
+
+    IMU_BASE(ImuParam params);
+
+    virtual ~IMU_BASE();
 
     /**
      * @brief Set parameters of imu
@@ -96,6 +99,14 @@ public:
      */
     void setIntType(int type){intType = type;}
 
+    /**
+     * @brief generate imu data for Allan derivation
+     * 
+     * @param t : time in s 
+     * @param imu_data  : vector of ImuMotionData
+     */
+    void generateAllanData(double t, vector<ImuMotionData> &imu_data);
+
 protected:
     Vec3d acc_bias_, gyr_bias_; //bias 
     double acc_n_, gyr_n_; // noise
@@ -116,7 +127,7 @@ protected:
     bool init_flag_ = false; // flag of initialization
     bool first_flag_ = true; // flag of first measurement
 
-    int intType = 1; // 0- euler; 1-mid
+    int intType = 0; // 0- euler; 1-mid
 
 };
 
