@@ -6,12 +6,18 @@
 
 using namespace std;
 
+enum FRAME{
+    GEO = 0,
+    MCMF,
+    MCI,
+};
+
 enum CELESTIAL{
     EARTH = 0,
     MOON = 1,
 };
 
-namespace myFusion{
+namespace MyFusion{
 
 /**
  * @brief Struct of IMU Parameters
@@ -53,7 +59,7 @@ struct ImuMotionData{
 class IMU_BASE{
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
+    
     IMU_BASE(ImuParam params);
 
     virtual ~IMU_BASE();
@@ -128,7 +134,7 @@ protected:
     bool first_flag_ = true; // flag of first measurement
 
     int intType = 0; // 0- euler; 1-mid
-
+    FRAME frameType_;
 };
 
 }

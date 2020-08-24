@@ -3,7 +3,7 @@
 
 #include "simulator/sensors/imu_base.h"
 
-namespace myFusion{
+namespace MyFusion{
 
 class IMU_LI:public IMU_BASE{
 public:

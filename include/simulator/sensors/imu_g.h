@@ -3,7 +3,7 @@
 
 #include "./imu_base.h"
 
-namespace myFusion{
+namespace MyFusion{
 
 class IMU_G:public IMU_BASE{
 public:

@@ -1,7 +1,7 @@
 #include "constParams.h"
 #include "simulator/sensors/imu_li.h"
 
-namespace myFusion{
+namespace MyFusion{
 
 void IMU_LI::oneStepIntegration()
 {

@@ -1,8 +1,9 @@
 #include "simulator/sensors/imu_g.h"
 
-namespace myFusion{
+namespace MyFusion{
 
 IMU_G::IMU_G(ImuParam params):IMU_BASE(params){
+    frameType_ = GEO;
 }
 
 void IMU_G::oneStepIntegration(){

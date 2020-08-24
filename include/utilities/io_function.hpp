@@ -2,9 +2,12 @@
 #define IO_FUNCTION_H_
 #include "commonHeaders.h"
 #include "simulator/sensors/imu_base.h"
+#include "simulator/sensors/cns.h"
+#include "simulator/sensors/virns.h"
+#include "simulator/sensors/cmns.h"
 
 using namespace std;
-using namespace myFusion;
+using namespace MyFusion;
 
 int readImuParam(string filename, ImuParam &param){
     cv::FileStorage fsParams(filename, cv::FileStorage::READ);
@@ -45,10 +48,11 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
         double roll(0.), pitch(0.), yaw(0.); 
         double vx(0.), vy(0.), vz(0.);
         double wx(0.), wy(0.), wz(0.), ax(0.), ay(0.), az(0.);
-        int ref = fscanf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le\n",
+        // int ref = fscanf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le\n",
+        int ref = fscanf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
                         &time_stamp, &px, &py, &pz,
                         &qw, &qx, &qy, &qz,
-                        &roll, &pitch, &yaw,
+                        &pitch, &yaw, &roll,
                         &vx, &vy, &vz,
                         &wx, &wy, &wz,
                         &ax, &ay, &az);
@@ -59,7 +63,7 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
         tmp.tnb_ = Vec3d(px, py, pz);
         tmp.vel_ = Vec3d(vx, vy, vz);
         tmp.qnb_ = Qd(qw, qx, qy, qz);
-        tmp.eulerAngles_ = Vec3d(roll, yaw, pitch);
+        tmp.eulerAngles_ = Vec3d(pitch, yaw, roll);
         tmp.acc_ = Vec3d(ax, ay, az);
         tmp.gyr_ = Vec3d(wx, wy, wz);
 
@@ -84,8 +88,8 @@ void writeImuMotionData(string filename, vector<ImuMotionData> &imu_data){
     fprintf(fp, "v_R_x[m/s], v_R_y[m/s], v_R_z[m/s], gyr_S_x[rad/s], gyr_S_y[rad/s], gyr_S_z[rad/s], acc_S_x[m/s^2], acc_S_y[m/s^2], acc_S_z[m/s^2]\n"); 
 
     for (auto it:imu_data){
-        // fprintf(fp, "%f,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", it.time_stamp_, 
-        fprintf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le\n", 
+        fprintf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
+        // fprintf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le\n", 
         // fprintf(fp, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le\n", 
                 it.time_stamp_, 
                 it.tnb_.x(), it.tnb_.y(), it.tnb_.z(),
@@ -94,6 +98,71 @@ void writeImuMotionData(string filename, vector<ImuMotionData> &imu_data){
                 it.vel_.x(), it.vel_.y(), it.vel_.z(),
                 it.gyr_.x(), it.gyr_.y(), it.gyr_.z(),
                 it.acc_.x(), it.acc_.y(), it.acc_.z());     
+    }
+}
+
+void writeCnsData(string filename, vector<CnsData> &cnsData){
+    FILE *fp;
+    struct stat buffer;
+    if(stat(filename.c_str(), &buffer) == 0)
+        system(("rm " + filename).c_str());    
+    fp = fopen(filename.c_str(), "w+");
+
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << filename << endl;
+        return;
+    }
+
+    fprintf(fp, "# time_stamp[s],q_RS_w[],q_RS_x[],q_RS_y[],q_RS_z[],Pitch[deg],Yaw[deg],Roll[deg]\n"); 
+    
+    for (auto it:cnsData){
+        fprintf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
+                it.timeStamp_, 
+                it.qnb_.w(), it.qnb_.x(), it.qnb_.y(), it.qnb_.z(),
+                it.eulerAngle_.x(), it.eulerAngle_.y(), it.eulerAngle_.z());     
+    }
+}
+
+void writeVirnsData(string filename, vector<VirnsData> &virnsData){
+    FILE *fp;
+    struct stat buffer;
+    if(stat(filename.c_str(), &buffer) == 0)
+        system(("rm " + filename).c_str());    
+    fp = fopen(filename.c_str(), "w+");
+
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << filename << endl;
+        return;
+    }
+
+    fprintf(fp, "# time_stamp[s], dp_x[m], dp_x[m], dp_z[m], p_x[m], p_y[m], p_z[m]\n"); 
+    
+    for (auto it:virnsData){
+        fprintf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
+                it.timeStamp_, 
+                it.dPos_.x(), it.dPos_.y(), it.dPos_.z(),
+                it.pos_.x(), it.pos_.y(), it.pos_.z());     
+    }
+}
+
+void writeCmnsData(string filename, vector<CmnsData> &cmnsData){
+    FILE *fp;
+    struct stat buffer;
+    if(stat(filename.c_str(), &buffer) == 0)
+        system(("rm " + filename).c_str());    
+    fp = fopen(filename.c_str(), "w+");
+
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << filename << endl;
+        return;
+    }
+
+    fprintf(fp, "# time_stamp[s], p_x[m], p_y[m], p_z[m]\n"); 
+    
+    for (auto it:cmnsData){
+        fprintf(fp, "%lf,%lf,%lf,%lf\n", 
+                it.timeStamp_, 
+                it.pos_.x(), it.pos_.y(), it.pos_.z());     
     }
 }
 
@@ -140,6 +209,28 @@ void writeAllanData(string filename, vector<ImuMotionData> &imu_data){
     }
 
 }
+
+void writeCNSData(string filename, vector<ImuMotionData> &cns_data){
+    FILE *fp;
+    struct stat buffer;
+    if(stat(filename.c_str(), &buffer) == 0)
+        system(("rm " + filename).c_str());    
+    fp = fopen(filename.c_str(), "w+");
+
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << filename << endl;
+        return;
+    }
+
+    fprintf(fp, "#time_stamp[s],Pitch[deg],Yaw[deg],Roll[deg]\n"); 
+
+    for (auto it:cns_data){
+        fprintf(fp, "%lf,%lf,%lf,%lf\n", 
+                it.time_stamp_, it.eulerAngles_.x(), it.eulerAngles_.y(), it.eulerAngles_.z()); 
+    }   
+}
+
+
 
 /**
  * @brief print percentage of progress

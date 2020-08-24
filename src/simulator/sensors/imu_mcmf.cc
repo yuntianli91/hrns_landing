@@ -1,16 +1,18 @@
 #include "simulator/sensors/imu_mcmf.h"
 
-namespace myFusion{
+namespace MyFusion{
 
 IMU_MCMF::IMU_MCMF(ImuParam params):IMU_BASE(params){
 //     setParams(params);
+    frameType_ = MCMF;
 }
 
 void IMU_MCMF::oneStepIntegration(){
     double h_m = tnb_.norm(); // distance to center
     double alt = h_m - R_m;
-    double lon = atan2(tnb_.y(), tnb_.x());    
-    double lat = atan2(tnb_.z(), tnb_.x());
+    double lon = atan2(tnb_.y(), tnb_.x());
+    double scale = sqrt(tnb_.x() * tnb_.x() + tnb_.y() * tnb_.y());    
+    double lat = atan2(tnb_.z(), scale);
     pos_ = Eigen::Vector3d(lat, lon, alt);
 
     Eigen::Vector3d w_im(0., 0., W_im);

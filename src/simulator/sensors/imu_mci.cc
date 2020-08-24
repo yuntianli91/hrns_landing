@@ -1,9 +1,8 @@
 #include "simulator/sensors/imu_mci.h"
 
-namespace myFusion{
+namespace MyFusion{
 
 IMU_MCI::IMU_MCI(ImuParam params):IMU_BASE(params){
-    
 }
 
 void IMU_MCI::oneStepIntegration(){

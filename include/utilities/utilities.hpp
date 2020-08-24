@@ -32,6 +32,66 @@ public:
         return ypr / M_PI * 180.0;
     }
 
+    /**
+     * @brief 
+     * 
+     * @param R 
+     * @return Eigen::Vector3d 
+     */
+    // static Eigen::Vector3d R2Euler(const Eigen::Matrix3d &R){
+    //     Eigen::Vector3d pyr;
+
+    //     if(R(2,0) > -0.99998f && R(2,0) < 0.99998f){
+    //         pyr(0) = atan2(R(1,0), R(0,0));
+    //         pyr(1) = asin(-R(2,0));
+    //         pyr(2) = atan2(R(2,1), R(2,2));
+    //     }
+    //     else
+    //     {
+    //         R(2,0) > 0.0f ? pyr(1) = -M_PI_2 : pyr(1) = M_PI_2;
+    //         pyr(0) = asin(-R(0,1));
+    //         pyr(2) = 0.;
+    //     }
+
+    //     return pyr;
+    // }
+
+    /**
+     * @brief Get the rotation matrix Cge(e->g) 
+     * 
+     * @param lat : latitude 
+     * @param lon : longitude
+     * @return Eigen::Matrix3d 
+     */
+    static Eigen::Matrix3d getCge(double lat, double lon){
+        Eigen::AngleAxisd rvec0(lat, Eigen::Vector3d(0., 0., 1.));
+        Eigen::AngleAxisd rvec1(M_PI_2, Eigen::Vector3d(0., 1., 0.));
+        Eigen::AngleAxisd rvec2((M_PI_2 - lon), Eigen::Vector3d(0., 0., 1.));
+
+        Eigen::Quaterniond qgb(rvec0 * rvec1 * rvec2);
+        return qgb.toRotationMatrix();
+    }
+
+    /**
+     * @brief Get the rotation matrix Cge(e->g) 
+     * 
+     * @param lat : latitude 
+     * @param lon : longitude
+     * @return Eigen::Matrix3d 
+     */
+    static Eigen::Matrix3d getCge(Eigen::Vector3d &tnb){
+        double scale = sqrt(tnb.x() * tnb.x() + tnb.y() * tnb.y());
+        double lat = atan2(tnb.z(), scale);
+        double lon = atan2(tnb.y(), tnb.x());
+
+        Eigen::AngleAxisd rvec0(lat, Eigen::Vector3d(0., 0., 1.));
+        Eigen::AngleAxisd rvec1(M_PI_2, Eigen::Vector3d(0., 1., 0.));
+        Eigen::AngleAxisd rvec2((M_PI_2 - lon), Eigen::Vector3d(0., 0., 1.));
+
+        Eigen::Quaterniond qgb(rvec0 * rvec1 * rvec2);
+        return qgb.toRotationMatrix();
+    }
+
 
 };
 
