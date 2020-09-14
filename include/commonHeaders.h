@@ -44,7 +44,12 @@ typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
 typedef Eigen::Matrix<double, 1, 1> Vec1d;
 typedef Eigen::Matrix<double, 1, 1> Mat1d;
+typedef Eigen::Matrix<double, 2, 1> Vec2d;
+typedef Eigen::Matrix<double, 2, 2> Mat2d;
 typedef Eigen::Vector3d Vec3d;
 typedef Eigen::Matrix3d Mat3d;
+typedef Eigen::Matrix<double, 4, 1> Vec4d;
+typedef Eigen::Matrix<double, 4, 4> Mat4d;
+
 typedef Eigen::Quaterniond Qd; 
 

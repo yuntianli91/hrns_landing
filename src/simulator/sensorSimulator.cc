@@ -108,7 +108,7 @@ void SensorSimulator::simVIRNS(const vector<ImuMotionData> trajData, vector<Virn
     int totalSize = trajData.size();
     for(size_t i = 0; i < totalSize; i++){
         int per = (i + 1) * 100 / totalSize;
-        printPer("Generating VIRNS measurements in MCMF", per);
+        printPer("Generating VIRNS relative measurements in MCMF", per);
  
         if (abs(trajData[i].time_stamp_ - lastTime - sensorParams_.virns_step_) > 1e-5)
             continue;
@@ -134,7 +134,7 @@ void SensorSimulator::simAbsVIRNS(const vector<ImuMotionData> trajData, vector<V
         virnsData[i].pos_ = lastPos;
         
         int per = (i + 1) * 100 / totalSize;
-        printPer("Generating VIRNS measurements in MCMF", per);
+        printPer("Generating VIRNS absolute measurements in MCMF", per);
     }
     // change line
     printf("\n");

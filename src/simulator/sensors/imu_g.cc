@@ -148,6 +148,7 @@ vector<ImuMotionData> IMU_G::trajGenerator(ImuMotionData initPose, vector<Vec3d>
 
         time_stamp += time_step_;
     }
+    printf("\n");
 
     return traj_data;
 }
