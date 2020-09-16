@@ -63,7 +63,7 @@ void SensorSimulator::simIMU(const vector<ImuMotionData> trajData, vector<ImuMot
     tmpParam.acc_n_ = sensorParams_.acc_n_; tmpParam.gyr_n_ = sensorParams_.gyr_n_;
     tmpParam.acc_w_ = sensorParams_.acc_w_; tmpParam.gyr_w_ = sensorParams_.gyr_w_;
 
-    IMU_MCMF imuSimulator(tmpParam);
+    IMU_G imuSimulator(tmpParam);
 
     imuData.clear();
     int totalSize = trajData.size();
@@ -73,7 +73,7 @@ void SensorSimulator::simIMU(const vector<ImuMotionData> trajData, vector<ImuMot
         imuData.emplace_back(tmp);
         
         int per = (i + 1) * 100 / totalSize;
-        printPer("Generating IMU measurements in MCMF", per);
+        printPer("Generating IMU measurements in GEO", per);
     }
     // change line
     printf("\n");
@@ -100,7 +100,7 @@ void SensorSimulator::simCNS(const vector<ImuMotionData> trajData, vector<CnsDat
     printf("\n");
 }
 
-void SensorSimulator::simVIRNS(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData){
+void SensorSimulator::simVIRNSRelative(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData){
     VIRNS virnsSimulator(0., sensorParams_.virns_sigma_);
     
     virnsData.clear();
@@ -116,16 +116,21 @@ void SensorSimulator::simVIRNS(const vector<ImuMotionData> trajData, vector<Virn
         VirnsData tmp = virnsSimulator.getRelativeMeasurement(trajData[i]);
         virnsData.emplace_back(tmp);
         lastTime = trajData[i].time_stamp_;
-
    }
     // change line
     printf("\n");
 }
 
-void SensorSimulator::simAbsVIRNS(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData){
-    simVIRNS(trajData, virnsData);
+void SensorSimulator::simVIRNS(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData){
+    // generate relative measurements
+    simVIRNSRelative(trajData, virnsData);
+    // generate absolute measurements
+    Vec3d initErr(0., 0., 0.);
+    initErr.x() = sensorParams_.virns_bias_ / R_m;
+    initErr.y() = sensorParams_.virns_bias_;
+    initErr.z() = sensorParams_.virns_bias_ / R_m;
 
-    Vec3d lastPos = Vec3d::Ones() * sensorParams_.virns_bias_ + trajData[0].tnb_;
+    Vec3d lastPos = initErr + trajData[0].tnb_;
 
     int totalSize = virnsData.size();
     for(size_t i = 0; i < totalSize; i++){

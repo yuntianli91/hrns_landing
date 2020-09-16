@@ -27,8 +27,25 @@ public:
      * @return Vec3d 
      */
     VirnsData getRelativeMeasurement(ImuMotionData currMotion);
+
+    /**
+     * @brief convert geo coordinate to mcmf coordinate with sphere model
+     * 
+     * @param geo : [lat, alt, lon] 
+     * @return Vec3d : [Px, Py, Pz]
+     */
+    Vec3d geo2mcmf(Vec3d geo);
+
+    /**
+     * @brief convert mcmf coordinate to geo coordinate with sphere model
+     * 
+     * @param mcmf : [Px, Py, Pz] 
+     * @return Vec3d : [lat, alt, lon]
+     */
+    Vec3d mcmf2geo(Vec3d mcmf);
     
-    ImuMotionData lastMotion_;
+    // ImuMotionData lastMotion_;
+    Vec3d lastP_, curP_; // last position and current position
     double bias_, sigma_; // noise bias and sigma
     bool flagInit_ = false;
     bool flagFirst = true;

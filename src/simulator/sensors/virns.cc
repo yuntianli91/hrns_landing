@@ -17,24 +17,37 @@ VirnsData VIRNS::getRelativeMeasurement(ImuMotionData currMotion){
 
     if(flagFirst){
         tmp.timeStamp_ = currMotion.time_stamp_;
+        curP_ = geo2mcmf(currMotion.tnb_);
+
         tmp.dPos_ = Vec3d(0., 0., 0.);
         flagFirst = false;            
     }
     else{
-        Vec3d dp = currMotion.tnb_ - lastMotion_.tnb_;
-
-        std::random_device rd; // random seed
-        std::default_random_engine rg(rd()); // random engine
-        std::normal_distribution<double> noise(0., 1.);
-
-        Vec3d dpNoise(noise(rg), noise(rg), noise(rg));
-        dp += sigma_ * dpNoise;
-
         tmp.timeStamp_ = currMotion.time_stamp_;
-        tmp.dPos_ = dp;        
+        curP_ = geo2mcmf(currMotion.tnb_);
+        tmp.dPos_ = curP_ - lastP_;
     }
     
-    lastMotion_ = currMotion;
+    lastP_ = curP_; // reset lastP
+    return tmp; // return result
+}
+
+Vec3d VIRNS::geo2mcmf(Vec3d geo){
+    Vec3d tmp;
+    double lat = geo.x();
+    double alt = geo.y(); 
+    double lon = geo.z(); 
+    
+    tmp.x() = (R_m + alt) * cos(lat) * cos(lon);
+    tmp.y() = (R_m + alt) * cos(lat) * sin(lon);
+    tmp.z() = (R_m + alt) * sin(lat);
+
+    return tmp;
+}
+
+Vec3d VIRNS::mcmf2geo(Vec3d mcmf){
+    Vec3d tmp;
+
     return tmp;
 }
 

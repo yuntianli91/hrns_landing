@@ -3,7 +3,7 @@
 #include "commonHeaders.h"
 #include "utilities/utilities.hpp"
 #include "utilities/io_function.hpp"
-#include "simulator/sensors/imu_mcmf.h"
+#include "simulator/sensors/imu_g.h"
 #include "simulator/sensors/cns.h"
 #include "simulator/sensors/cmns.h"
 #include "simulator/sensors/virns.h"
@@ -65,7 +65,7 @@ public:
      * @param trajData 
      * @param virnsData 
      */
-    void simVIRNS(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData);
+    void simVIRNSRelative(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData);
 
     /**
      * @brief 
@@ -73,7 +73,7 @@ public:
      * @param trajData 
      * @param virnsData 
      */
-    void simAbsVIRNS(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData);
+    void simVIRNS(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData);
     
     /**
      * @brief 

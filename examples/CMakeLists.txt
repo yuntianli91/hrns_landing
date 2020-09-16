@@ -19,3 +19,4 @@ target_link_libraries(spkfDemo myFusion ${THIRD_PARTY_LIBS})
 add_executable(glintDemo glintDemo.cc)
 target_link_libraries(glintDemo myFusion ${THIRD_PARTY_LIBS})
 
+

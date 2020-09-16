@@ -41,6 +41,7 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
     fgets(header, 1024, fp);
     // 读取数据到相关容器中
     imu_data.clear();
+    printf("[1] Reading trajectory data...\n");
     while(!feof(fp)){
         double time_stamp(0);
         double px(0.), py(0.), pz(0.);
@@ -49,14 +50,16 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
         double vx(0.), vy(0.), vz(0.);
         double wx(0.), wy(0.), wz(0.), ax(0.), ay(0.), az(0.);
         // int ref = fscanf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le\n",
-        int ref = fscanf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+        int ref = fscanf(fp, "%lf,%le,%lf,%le,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%le,%le,%le,%le,%le,%le\n",
                         &time_stamp, &px, &py, &pz,
                         &qw, &qx, &qy, &qz,
                         &pitch, &yaw, &roll,
                         &vx, &vy, &vz,
                         &wx, &wy, &wz,
                         &ax, &ay, &az);
-        if(ref == -1){break;} // avoid read last line twicea
+        if(ref == -1){
+            break;
+        } // avoid read last line twicea
 
         ImuMotionData tmp;
         tmp.time_stamp_ = time_stamp;
@@ -69,6 +72,7 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
 
         imu_data.emplace_back(tmp);
     }
+    cout << "[1] Totally read " << imu_data.size() << " traj data.\n";
     fclose(fp);    
 }
 
@@ -88,8 +92,8 @@ void writeImuMotionData(string filename, vector<ImuMotionData> &imu_data){
     fprintf(fp, "v_R_x[m/s], v_R_y[m/s], v_R_z[m/s], gyr_S_x[rad/s], gyr_S_y[rad/s], gyr_S_z[rad/s], acc_S_x[m/s^2], acc_S_y[m/s^2], acc_S_z[m/s^2]\n"); 
 
     for (auto it:imu_data){
-        fprintf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
-        // fprintf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le\n", 
+        fprintf(fp, "%lf,%le,%lf,%le,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%le,%le,%le,%le,%le,%le\n",
+        // fprintf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
         // fprintf(fp, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le\n", 
                 it.time_stamp_, 
                 it.tnb_.x(), it.tnb_.y(), it.tnb_.z(),
