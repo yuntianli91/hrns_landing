@@ -2,6 +2,7 @@
 #define VIRNS_H_
 #include "commonHeaders.h"
 #include "simulator/sensors/imu_base.h"
+#include "utilities/utilities.hpp"
 
 namespace MyFusion{
 
@@ -27,22 +28,6 @@ public:
      * @return Vec3d 
      */
     VirnsData getRelativeMeasurement(ImuMotionData currMotion);
-
-    /**
-     * @brief convert geo coordinate to mcmf coordinate with sphere model
-     * 
-     * @param geo : [lat, alt, lon] 
-     * @return Vec3d : [Px, Py, Pz]
-     */
-    Vec3d geo2mcmf(Vec3d geo);
-
-    /**
-     * @brief convert mcmf coordinate to geo coordinate with sphere model
-     * 
-     * @param mcmf : [Px, Py, Pz] 
-     * @return Vec3d : [lat, alt, lon]
-     */
-    Vec3d mcmf2geo(Vec3d mcmf);
     
     // ImuMotionData lastMotion_;
     Vec3d lastP_, curP_; // last position and current position

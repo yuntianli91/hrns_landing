@@ -91,8 +91,29 @@ public:
         Eigen::Quaterniond qgb(rvec0 * rvec1 * rvec2);
         return qgb.toRotationMatrix();
     }
+};
 
+class FrameConvert{
+public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    static Vec3d geo2mcmf(Vec3d geo){
+        Vec3d tmp;
+        double lat = geo.x();
+        double alt = geo.y(); 
+        double lon = geo.z(); 
+    
+        tmp.x() = (R_m + alt) * cos(lat) * cos(lon);
+        tmp.y() = (R_m + alt) * cos(lat) * sin(lon);
+        tmp.z() = (R_m + alt) * sin(lat);
 
+        return tmp;
+    }
+
+    static Vec3d mcmf2geo(Vec3d mcmf){
+        Vec3d tmp;
+
+        return tmp;
+    }
 };
 
 #endif

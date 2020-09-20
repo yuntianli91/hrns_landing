@@ -14,6 +14,7 @@ int main(int argc, char** argv){
     vector<ImuMotionData> imuData;
     mySimulator.simIMU(trajData, imuData);
     writeImuMotionData("../data/sensorSimData/imuData.csv", imuData);
+    writePos("../data/sensorSimData/posNED.csv", imuData);
     // 生成CNS数据
     // vector<CnsData> cnsData;
     // mySimulator.simCNS(trajData, cnsData);

@@ -24,7 +24,7 @@ cns_n: 9 # arcsec
 ### VIRNS parameters
 virns_step: 0.05 # 20Hz 
 virns_b: 100 # bias of initial position
-virns_n: 0 # noise of position
+virns_n: 15 # noise of position
 ### CMNS parameters
 cmns_step: 1 # 5s
 cmns_n : 5 # noise of absolute

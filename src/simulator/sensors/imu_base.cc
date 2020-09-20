@@ -26,7 +26,6 @@ void IMU_BASE::oneStepPropagate(ImuMotionData &data){
         std::cout << "Please initiate imu parameters first !\n";
         return;
     }
-
     // extract imu measurements and states
     acc_1_ = data.acc_; gyr_1_ = data.gyr_;
     // add noise to trajectory data  
@@ -35,7 +34,9 @@ void IMU_BASE::oneStepPropagate(ImuMotionData &data){
     if(first_flag_){
         tnb_ = data.tnb_; vel_ = data.vel_;
         qnb_ = data.qnb_;
-        pos_ = data.pos_;
+        // pos_ = data.pos_;
+        pos_ = Vec3d(0., tnb_.y(), 0.);
+        // pos_ = FrameConvert::geo2mcmf(tnb_);
         // cout << "\nIntegration type: " << intType << endl;
         first_flag_ = false;
     }

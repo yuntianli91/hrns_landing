@@ -13,10 +13,10 @@ target_link_libraries(simSensors myFusion ${THIRD_PARTY_LIBS})
 add_executable(spkfDemo spkfDemo.cc)
 target_link_libraries(spkfDemo myFusion ${THIRD_PARTY_LIBS})
 
-# add_executable(cnsFusion cnsFusion.cc)
-# target_link_libraries(cnsFusion myFusion ${THIRD_PARTY_LIBS})
-
 add_executable(glintDemo glintDemo.cc)
 target_link_libraries(glintDemo myFusion ${THIRD_PARTY_LIBS})
+
+add_executable(scspkfDemo scspkfDemo.cc)
+target_link_libraries(scspkfDemo myFusion ${THIRD_PARTY_LIBS})
 
 

@@ -125,12 +125,7 @@ void SensorSimulator::simVIRNS(const vector<ImuMotionData> trajData, vector<Virn
     // generate relative measurements
     simVIRNSRelative(trajData, virnsData);
     // generate absolute measurements
-    Vec3d initErr(0., 0., 0.);
-    initErr.x() = sensorParams_.virns_bias_ / R_m;
-    initErr.y() = sensorParams_.virns_bias_;
-    initErr.z() = sensorParams_.virns_bias_ / R_m;
-
-    Vec3d lastPos = initErr + trajData[0].tnb_;
+    Vec3d lastPos = Vec3d::Ones() * sensorParams_.virns_bias_ + FrameConvert::geo2mcmf(trajData[0].tnb_);
 
     int totalSize = virnsData.size();
     for(size_t i = 0; i < totalSize; i++){

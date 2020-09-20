@@ -40,7 +40,7 @@ traj_data = pd.read_csv('../data/stdTraj/caGeo.csv').values
 # imu_data = pd.read_csv('../data/stdTraj/caGeoImu.csv').values
 imu_data = pd.read_csv('../data/sensorSimData/imuData.csv').values
 ned_data = pd.read_csv('../data/stdTraj/posNED.csv').values
-ned_data_imu = pd.read_csv('../data/stdTraj/posNEDImu.csv').values
+ned_data_imu = pd.read_csv('../data/sensorSimData/posNED.csv').values
 # beacon_location = pd.read_csv('/home/yuntian/dataset/simulator/lander/beacon_location.csv').values
 ###################### 提取各数据序列（注意python切片不包括尾部） ####################
 time_series = traj_data[:,0]
@@ -59,16 +59,15 @@ vel_imu = imu_data[:,11:14]
 gyr_imu = imu_data[:,14:17]
 acc_imu = imu_data[:,17:20]
 
-# # beacon_loc = beacon_location[:,4:7]
-# ned_data = ned_data / 1000.
-# ned_data_imu = ned_data_imu / 1000.
+ned_data = ned_data / 1000.
+ned_data_imu = ned_data_imu / 1000.
 
-# N = len(ned_data[:,0])
-# downRange = np.zeros(N)
-# downRangeImu = np.zeros(N)
-# for i in range(0, N):   
-#     downRange[i] = math.sqrt(ned_data[i,0] * ned_data[i,0] + ned_data[i,1] * ned_data[i,1])
-#     downRangeImu[i] = math.sqrt(ned_data_imu[i,0] * ned_data_imu[i,0] + ned_data_imu[i,1] * ned_data_imu[i,1])
+N = len(ned_data[:,0])
+downRange = np.zeros(N)
+downRangeImu = np.zeros(N)
+for i in range(0, N):   
+    downRange[i] = math.sqrt(ned_data[i,0] * ned_data[i,0] + ned_data[i,1] * ned_data[i,1])
+    downRangeImu[i] = math.sqrt(ned_data_imu[i,0] * ned_data_imu[i,0] + ned_data_imu[i,1] * ned_data_imu[i,1])
 ######################### 画图 #########################
 # 图注使用$$开启数学环境
 labels = ['trajectory','IMU']
@@ -328,28 +327,28 @@ axes[2].grid()
 
 fig5.savefig('att.pdf', format='pdf')
 # ##### figure6 #####
-# fig6, axis = plt.subplots(1,1,figsize=(6,4))
+fig6, axis = plt.subplots(1,1,figsize=(6,4))
 
-# axis.plot(ned_data[:,3], ned_data[:,1], color=colors[0], lw=2)
-# # axis.plot(ned_data_imu[:,3], ned_data_imu[:,1], color=colors[1])
-# axis.grid()
-# # axis.set_xlabel("东向(km)")
-# # axis.set_ylabel("北向(km)")
-# # axis.legend(labels)
-# axis.set_xlabel("East(km)")
-# axis.set_ylabel("North(km)")
+axis.plot(ned_data[:,3], ned_data[:,1], color=colors[0], lw=2)
+axis.plot(ned_data_imu[:,3], ned_data_imu[:,1], color=colors[1])
+axis.grid()
+# axis.set_xlabel("东向(km)")
+# axis.set_ylabel("北向(km)")
+# axis.legend(labels)
+axis.set_xlabel("East(km)")
+axis.set_ylabel("North(km)")
 
 # fig6.savefig('ne.pdf', format='pdf')
 # ##### figure7 ######
-# fig7, axis = plt.subplots(1,1, figsize=(6,4))
-# axis.plot(downRange, pos[:,1], color=colors[0], lw=2)
-# # axis.plot(downRangeImu, pos_imu[:,1], color=colors[1])
-# # axis.set_xlabel("航向(km)")
-# # axis.set_ylabel("高程(km)")
-# # axis.legend(labels)
-# axis.set_xlabel("downrange(km)")
-# axis.set_ylabel("alt(km)")
-# axis.grid()
+fig7, axis = plt.subplots(1,1, figsize=(6,4))
+axis.plot(downRange, pos[:,1], color=colors[0], lw=2)
+axis.plot(downRangeImu, pos_imu[:,1], color=colors[1])
+# axis.set_xlabel("航向(km)")
+# axis.set_ylabel("高程(km)")
+# axis.legend(labels)
+axis.set_xlabel("downrange(km)")
+axis.set_ylabel("alt(km)")
+axis.grid()
 
 # fig7.savefig('da.pdf', format='pdf')
 # plt.axis('equal')

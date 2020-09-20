@@ -8,8 +8,10 @@ add_library(myFusion SHARED
             simulator/sensors/virns.cc
             simulator/sensors/cmns.cc
             simulator/sensorSimulator.cc
-            backend/sckf.cc
             backend/spkf.cc
             backend/cnsUKF.cc
             backend/cnsHCKF.cc
+            backend/sckf/sckf.cc
+            # backend/sckf/scekf.cc
+            backend/sckf/scspkf.cc
             )

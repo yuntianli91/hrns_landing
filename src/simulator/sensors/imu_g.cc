@@ -12,6 +12,7 @@ void IMU_G::oneStepIntegration(){
     double curAlt = tnb_.y(); // current height
     double curLon = tnb_.z(); // current longitude
     double h_m = R_m + curAlt; // (R_m + h)
+
     // compute w^G_im = [W_im * cosL, 0, -W_m * sinL]
     Vec3d w_im(W_im * cos(curLat), W_im * sin(curLat), 0.);
     // compute w^G_mg = [v_e / h_m, -v_n / h_m, -v_e * tanL / h_m]
@@ -61,7 +62,7 @@ void IMU_G::oneStepIntegration(){
 
         // compute gravity
         Eigen::Vector3d gn = Vec3d::Zero(); // gravity vector
-        gn.y() = -computeG(curAlt); // NED
+        gn.y() = -computeG(curAlt); // NUE
 
         // compute velocity
         Vec3d vel0 = vel_;
