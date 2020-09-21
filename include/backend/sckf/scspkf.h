@@ -18,18 +18,20 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     SCSPKF(){} // delete default constructor
     SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType=SP_HCKF);
+    void setUKFParams(double alpha, double beta, double kappa);
     // ------ filter functions ------ //
     void genSigmaPoints(vector<VecXd> &sPoints, bool aug=0);
-    void genSigmaPointsUKF(vector<VecXd> &sPoints, bool aug=0);
     // void genSigmaPointsCKF(vector<VecXd> &sPoints);
-    void genSigmaPointsHCKF(vector<VecXd> &sPoints, bool aug=0); 
-    void genSiHCKF(vector<VecXd> &allSi, int xSize); // generate cubature points
+    void genSi(vector<VecXd> &allSi, int xSize);
+    void genSiUKF(vector<VecXd> &allSi, int xSize); // generate UKF cubature points
+    void genSiCKF(vector<VecXd> &allSi, int xSize); // generate CKF cubature points
+    void genSiHCKF(vector<VecXd> &allSi, int xSize); // generate HCKF cubature points
     void getScaleHCKF(double &scale0, double &scale1, size_t k);
 
     void computeWeight(vector<double> &weightMu, vector<double> &weightSigma, int xSize);
-    void computeWeightUKF(vector<double> &weightMu, vector<double> &weightSigma, int xSize);
-    // void computeWeightCKF();
-    void computeWeightHCKF(vector<double> &weightMu, vector<double> &weightSigma, int xSize);
+    void computeWeightUKF(vector<double> &weightMu, vector<double> &weightSigma, int xSize); // compute UKF weights
+    void computeWeightCKF(vector<double> &weightMu, vector<double> &weightSigma, int xSize); // compute CKF weights
+    void computeWeightHCKF(vector<double> &weightMu, vector<double> &weightSigma, int xSize); // compute HCKF weights
  
     void oneStepPrediction(VecXd &U) override;
     void oneStepUpdate(VecXd &Z) override;
@@ -56,6 +58,7 @@ protected:
     double alpha_, beta_, kappa_, lambda_; // parameters of UKF 
     double gamma_; // coefficient HCKF(sqrt(n+2)), CKF(sqrt(n)), UKF(sqrt(n+lambda)) 
     // bool firstGen_ = true;
+    bool ukfInit_ = false;
 };
 
 

@@ -8,8 +8,8 @@ SCSPKF::SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType):SC
     computeWeight(weightMu_, weightSigma_, xSize_); // calculate weight of state
     computeWeight(weightMuAug_, weightSigmaAug_, 2 * xSize_); // calculate weight of augState
     // compute cubature points
-    genSiHCKF(allSi_, xSize_); // cubature points
-    genSiHCKF(allSiAug_, 2 * xSize_); // aug cubature points
+    genSi(allSi_, xSize_); // cubature points
+    genSi(allSiAug_, 2 * xSize_); // aug cubature points
     // print si and weight for debug
     // printWeight(weightMu_, varName(weightMu_), 20);
     // printSi(allSi_, varName(allsi_), 20);
@@ -17,26 +17,17 @@ SCSPKF::SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType):SC
     // printSi(allSiAug_, varName(allSiAug_), 20);
 }
 
+void SCSPKF::setUKFParams(double alpha, double beta, double kappa){
+    alpha_ = alpha;
+    beta_ = beta;
+    kappa_ = kappa;
+    lambda_ = 3 * alpha_ * alpha_ - xSize_; 
+
+    ukfInit_ = true;
+    printf("[UKF] Parameters: alpha (%lf), beta (%lf), kappa (%lf).\n", alpha_, beta_, kappa_);
+}
+
 void SCSPKF::genSigmaPoints(vector<VecXd> &sPoints, bool aug){
-    switch (sigmaType_)
-    {
-    case SP_UKF:
-        genSigmaPointsUKF(sPoints, aug);   
-        break;
-    case SP_HCKF:
-        genSigmaPointsHCKF(sPoints, aug);
-        break;
-    default:
-        cout << "Unknown sample type !\n";
-        break;
-    }
-}
-
-void SCSPKF::genSigmaPointsUKF(vector<VecXd> &sPoints, bool aug){
-
-}
-
-void SCSPKF::genSigmaPointsHCKF(vector<VecXd> &sPoints, bool aug){
     if(sPoints.size() != 0)
         sPoints.clear();
 
@@ -57,14 +48,61 @@ void SCSPKF::genSigmaPointsHCKF(vector<VecXd> &sPoints, bool aug){
             sPoints.emplace_back(point);
         }
     }
-    
-    // ------------- print sigma points for debug
-    // int totalSize = sPoints.size();
-    // MatXd outSPoints = MatXd::Zero(xSize_, totalSize);
-    // for(size_t i = 0; i < totalSize; i++){
-    //     outSPoints.col(i) = sPoints[i].transpose();
-    // }
-    // cout << "Sigma Points:\n" << setprecision(3) << outSPoints << endl;
+}
+
+void SCSPKF::genSi(vector<VecXd> &allSi, int xSize){
+    switch (sigmaType_)
+    {
+    case SP_UKF:
+        genSiUKF(allSi, xSize);   
+        break;
+    case SP_CKF:
+        genSiCKF(allSi, xSize);
+        break;
+    case SP_HCKF:
+        genSiHCKF(allSi, xSize);
+        break;
+    default:
+        cout << "Unknown sample type !\n";
+        break;
+    }
+}
+
+void SCSPKF::genSiUKF(vector<VecXd> &allSi, int xSize){
+    gamma_ = sqrt(xSize + lambda_);
+    if (allSi.size() != 0)
+         allSi.clear();
+    // 0
+    VecXd si = VecXd::Zero(xSize);
+    allSi.emplace_back(si);
+    // 1 ~ 2n
+    MatXd I = MatXd::Identity(xSize, xSize);
+    for(size_t i = 0; i < xSize; i++){
+        allSi.emplace_back(gamma_ * I.col(i));
+    }
+    for(size_t i = 0; i < xSize; i++){
+        allSi.emplace_back(-gamma_ * I.col(i));
+    }   
+    // check dims
+    if(allSi.size() != 2 * xSize + 1)
+        cout << "Error size of Si !\n";
+}
+
+void SCSPKF::genSiCKF(vector<VecXd> &allSi, int xSize){
+    gamma_ = sqrt(xSize);
+    if (allSi.size() != 0)
+         allSi.clear();
+    // 1 ~ 2n
+    MatXd I = MatXd::Identity(xSize, xSize);
+    for(size_t i = 0; i < xSize; i++){
+        allSi.emplace_back(gamma_ * I.col(i));
+    }
+    for(size_t i = 0; i < xSize; i++){
+        allSi.emplace_back(-gamma_ * I.col(i));
+    }   
+    // check dims
+    if(allSi.size() != 2 * xSize)
+        cout << "Error size of Si !\n";
 }
 
 void SCSPKF::genSiHCKF(vector<VecXd> &allSi, int xSize){
@@ -73,8 +111,8 @@ void SCSPKF::genSiHCKF(vector<VecXd> &allSi, int xSize){
     if(allSi.size() != 0)
         allSi.clear();
     
-    VecXd si = VecXd::Zero(xSize); 
     // 0
+    VecXd si = VecXd::Zero(xSize); 
     allSi.emplace_back(si);
     // 1 ~ 2n(n-1)
     for (size_t k = 0; k < 4; k++){
@@ -138,6 +176,9 @@ void SCSPKF::computeWeight(vector<double> &weightMu, vector<double> &weightSigma
     case SP_UKF:
         computeWeightUKF(weightMu, weightSigma, xSize);        
         break;
+    case SP_CKF:
+        computeWeightCKF(weightMu, weightSigma, xSize);
+        break;
     case SP_HCKF:
         computeWeightHCKF(weightMu, weightSigma, xSize);
         break;
@@ -148,7 +189,38 @@ void SCSPKF::computeWeight(vector<double> &weightMu, vector<double> &weightSigma
 }
 
 void SCSPKF::computeWeightUKF(vector<double> &weightMu, vector<double> &weightSigma, int xSize){
+    // clear container
+    weightMu.clear(); weightSigma.clear();
+    // ====== weight mu ====== //
+    double scale = xSize + lambda_;
+    double W0 = lambda_ / scale;
+    double W1 = lambda_ / scale + 1 - alpha_ * alpha_ + beta_;
+    double W2 = 1. / (2. * scale);
+    // 0
+    weightMu.emplace_back(W0);
+    weightSigma.emplace_back(W1);
+    // 1 ~ 2n
+    auto iter = weightMu.begin() + 1;
+    int cnt = 2 * xSize;
+    weightMu.insert(iter, cnt, W2);
 
+    iter = weightSigma.begin() + 1;
+    weightSigma.insert(iter, cnt, W2);
+}
+
+void SCSPKF::computeWeightCKF(vector<double> &weightMu, vector<double> &weightSigma, int xSize){
+    // clear container
+    weightMu.clear(); weightSigma.clear();
+    // ====== weight mu ====== //
+    double W = 1. / (2. * xSize) ;
+    
+    // 2n
+    int cnt = 2 * xSize;
+    auto iter = weightMu.begin();
+    weightMu.insert(iter, cnt, W);
+    // ====== weight sigma ====== //
+    iter = weightSigma.begin();
+    weightSigma.insert(iter, cnt, W);   
 }
 
 void SCSPKF::computeWeightHCKF(vector<double> &weightMu, vector<double> &weightSigma, int xSize){
@@ -178,11 +250,15 @@ void SCSPKF::oneStepPrediction(VecXd &U){
         cout << "Please call initSCKF() first !\n";
         return;
     }
+    if(sigmaType_ == SP_UKF && !ukfInit_){
+        cout << "Please call setUKFParams() to initiate parameters.\n";
+        return;
+    }
     // clear point contailer
     sPointsX_.clear();
     sPointsY_.clear();
     // generate sigma points
-    genSigmaPointsHCKF(sPointsX_);
+    genSigmaPoints(sPointsX_);
     // propagate sigma points
     propagateFcn(sPointsX_, sPointsY_, U);
     // calculate mean and covariance
@@ -211,7 +287,7 @@ void SCSPKF::oneStepUpdate(VecXd &Z){
     sPointsX_.clear();
     sPointsY_.clear();
     // generate sigma points
-    genSigmaPointsHCKF(sPointsX_, true);
+    genSigmaPoints(sPointsX_, true);
     // propagate sigma points
     updateFcn(sPointsX_, sPointsY_);
     VecXd tmpZ = calcWeightedMean(sPointsY_, weightMuAug_);

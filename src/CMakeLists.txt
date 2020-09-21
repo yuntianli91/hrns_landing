@@ -14,4 +14,5 @@ add_library(myFusion SHARED
             backend/sckf/sckf.cc
             # backend/sckf/scekf.cc
             backend/sckf/scspkf.cc
+            backend/sckf/pdSCSPKF.cc
             )
