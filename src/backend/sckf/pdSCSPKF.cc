@@ -3,7 +3,7 @@
 namespace MyFusion
 {
     
-PdSCSPKF::PdSCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType=SP_HCKF):SCSPKF(Mu,Sigma,Q,R,sigmaType){
+PdSCSPKF::PdSCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType):SCSPKF(Mu,Sigma,Q,R,sigmaType){
     cout << "Initiated SCSPKF for power descend.\n";
 }
 

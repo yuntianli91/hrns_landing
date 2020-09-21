@@ -28,13 +28,23 @@ int main(int argc, char ** argv){
     vector<Vec3d> x(N);
     vector<VecXd> y(N);
 
+    int mCnt = 0;
     for(int i = 0; i < N; i++){
         x[i] = Vec3d::Ones() * 5.0;
-        VecXd noiseY = VecXd::Zero(8);
-        noiseY.segment(4, 4) = Vec4d(0.61548, M_PI_4, 0.61548, 3. * M_PI_4);
-        SensorNoise::addGlintNoise(noiseY, 0.1, 0.6, GAUSSIAN, 0.0);
-        y[i] = noiseY;
-    }
+        if(mCnt % 20 == 0){
+            // relative plus absolute
+            VecXd noiseY = VecXd::Zero(8);
+            noiseY.segment(4, 4) = Vec4d(0.61548, M_PI_4, 0.61548, 3. * M_PI_4);
+            SensorNoise::addGlintNoise(noiseY, 0.1, 0.6, GAUSSIAN, 0.0);
+            y[i] = noiseY;
+        }
+        else{
+            // relative
+            VecXd noiseY = VecXd::Zero(4);
+            SensorNoise::addGlintNoise(noiseY, 0.1, 0.6, GAUSSIAN, 0.0);
+            y[i] = noiseY;   
+        }
+   }
     // cout << x.transpose() << endl;
     // cout << y.transpose() << endl;
 

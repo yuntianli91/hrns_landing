@@ -35,9 +35,11 @@ protected:
     MatXd Sigma_, lastSigma_, augSigma_; // current, clonal and augmented covariance
     MatXd Phi_; // multiplicative Jacobian
     MatXd Q_, R_;// process and measurement noise covariance matrix
+    MatXd curR_; // current R of (relative) / (relative + absolute)
     VecXd residual_; // current measurement residual
 
     int xSize_, mSize_; // size of state and measurements
+    int curMSize_; // current measurement size
 
     bool flagInitialized_ = false;
 };

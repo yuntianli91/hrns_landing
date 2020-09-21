@@ -272,6 +272,8 @@ void SCSPKF::oneStepPrediction(VecXd &U){
 }
 
 void SCSPKF::oneStepUpdate(VecXd &Z){
+    curMSize_ = Z.size();
+    curR_ = R_.block(0, 0, curMSize_, curMSize_); // switch R
     // augmented mean and covariance
     augMu_ = VecXd::Zero(2 * xSize_);
     augSigma_ = MatXd::Zero(2 * xSize_, 2 * xSize_);
@@ -291,7 +293,7 @@ void SCSPKF::oneStepUpdate(VecXd &Z){
     // propagate sigma points
     updateFcn(sPointsX_, sPointsY_);
     VecXd tmpZ = calcWeightedMean(sPointsY_, weightMuAug_);
-    MatXd SigmaZZ = calcWeightedCov(sPointsY_, weightMuAug_, weightSigmaAug_) + R_;
+    MatXd SigmaZZ = calcWeightedCov(sPointsY_, weightMuAug_, weightSigmaAug_) + curR_;
     MatXd SigmaXZ = calcWeightedCrossCov(sPointsX_, sPointsY_, weightMuAug_, weightSigmaAug_);
     // compute Kalman gain
     MatXd K = SigmaXZ * SigmaZZ.inverse();
@@ -322,10 +324,10 @@ void SCSPKF::updateFcn(vector<VecXd> &sPointsX, vector<VecXd> &sPointsY){
     if(sPointsY_.size() != 0)
         sPointsY_.clear();
     // ---- test 3D const demo ---- //
-    VecXd curZ = VecXd::Zero(mSize_ / 2);
-    VecXd lastZ = VecXd::Zero(mSize_ / 2);
+    int hMSize = mSize_ / 2;
+    VecXd curZ = VecXd::Zero(hMSize);
+    VecXd lastZ = VecXd::Zero(hMSize);
     for(auto it: sPointsX_){
-        VecXd tmpZ = VecXd::Zero(8); 
         // compute lastZ
         double scale = sqrt(it(0) * it(0) + it(1) * it(1));
         lastZ(0) = atan2(it(2), scale);
@@ -343,9 +345,15 @@ void SCSPKF::updateFcn(vector<VecXd> &sPointsX, vector<VecXd> &sPointsY){
         curZ(2) = atan2(it(5), scale);
         curZ(3) = atan2(it(4), it(3) - 10.);
 
-        tmpZ.segment(0, 4) = curZ - lastZ;
-        tmpZ.segment(4, 4) = curZ;
-
+        
+        VecXd tmpZ = VecXd::Zero(curMSize_); 
+        if(curMSize_ == mSize_){
+            tmpZ.segment(0, hMSize) = curZ - lastZ;
+            tmpZ.segment(hMSize, hMSize) = curZ;
+        }
+        else{
+            tmpZ = curZ - lastZ;
+        }
         sPointsY.emplace_back(tmpZ);
     }        
 }
