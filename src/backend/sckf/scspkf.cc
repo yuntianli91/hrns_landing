@@ -3,6 +3,10 @@
 namespace MyFusion{
 
 SCSPKF::SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType):SCKF(Mu, Sigma, Q, R){
+    initSCSPKF(Mu, Sigma, Q, R, sigmaType);
+}
+
+void SCSPKF::initSCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType){
     sigmaType_ = sigmaType;
     // compute weight
     computeWeight(weightMu_, weightSigma_, xSize_); // calculate weight of state
@@ -247,11 +251,15 @@ void SCSPKF::computeWeightHCKF(vector<double> &weightMu, vector<double> &weightS
 
 void SCSPKF::oneStepPrediction(VecXd &U){
     if(!flagInitialized_){
-        cout << "Please call initSCKF() first !\n";
+        cerr << "Please call initSCKF() first !\n";
         return;
     }
     if(sigmaType_ == SP_UKF && !ukfInit_){
-        cout << "Please call setUKFParams() to initiate parameters.\n";
+        cerr << "Please call setUKFParams() to initiate parameters.\n";
+        return;
+    }
+    if(!siInit_){
+        cerr << "Please call initSCSPKF() to generate cubature points.\n";
         return;
     }
     // clear point contailer

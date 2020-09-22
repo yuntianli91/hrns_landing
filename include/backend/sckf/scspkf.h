@@ -16,8 +16,9 @@ namespace MyFusion{
 class SCSPKF : public SCKF{
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    SCSPKF(){} // delete default constructor
+    SCSPKF(){} // default constructor
     SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType=SP_HCKF);
+    void initSCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType);
     void setUKFParams(double alpha, double beta, double kappa);
     // ------ filter functions ------ //
     void genSigmaPoints(vector<VecXd> &sPoints, bool aug=0);
@@ -59,6 +60,7 @@ protected:
     double gamma_; // coefficient HCKF(sqrt(n+2)), CKF(sqrt(n)), UKF(sqrt(n+lambda)) 
     // bool firstGen_ = true;
     bool ukfInit_ = false;
+    bool siInit_ = false;
 };
 
 

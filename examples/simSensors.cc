@@ -1,5 +1,5 @@
 #include "simulator/sensorSimulator.h"
-#include "utilities/io_function.hpp"
+#include "utilities/io_function.h"
 
 using namespace std;
 using namespace MyFusion;
@@ -10,7 +10,7 @@ int main(int argc, char** argv){
     // 读取轨迹数据
     vector<ImuMotionData> trajData;
     readImuMotionData("../data/stdTraj/caGeo.csv", trajData);
-    // 生成IMU数据
+    // // 生成IMU数据
     vector<ImuMotionData> imuData;
     mySimulator.simIMU(trajData, imuData);
     writeImuMotionData("../data/sensorSimData/imuData.csv", imuData);
@@ -24,10 +24,9 @@ int main(int argc, char** argv){
     mySimulator.simVIRNS(trajData, virnsData);
     writeVirnsData("../data/sensorSimData/virnsData.csv", virnsData);
     // // 生成绝对量测数据
-    // vector<CmnsData> cmnsData;
-    // mySimulator.simCMNS(trajData, cmnsData);
-    // writeCmnsData("../data/sensorSimData/cmnsData.csv", cmnsData);
-
+    vector<CmnsData> cmnsData;
+    mySimulator.simCMNS(trajData, cmnsData);
+    writeCmnsData("../data/sensorSimData/cmnsData.csv", cmnsData);
 
     return 0;
 }

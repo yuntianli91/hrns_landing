@@ -156,7 +156,6 @@ void SensorSimulator::simCMNS(const vector<ImuMotionData> trajData, vector<CmnsD
         CmnsData tmp = cmnsSimulator.getMeasurement(trajData[i]);
         cmnsData.emplace_back(tmp);
         lastTime = trajData[i].time_stamp_;
-
    }
     // change line
     printf("\n");

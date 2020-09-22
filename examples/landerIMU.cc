@@ -9,10 +9,11 @@
  * 
  */
 #include "commonHeaders.h"
-#include "utilities/io_function.hpp"
+#include "utilities/io_function.h"
 #include "simulator/sensors/imu_g.h"
 
 using namespace std;
+using namespace MyFusion;
 
 
 vector<ImuMotionData> traj_data;

@@ -2,18 +2,19 @@
 #define CMNS_H_
 #include "commonHeaders.h"
 #include "simulator/sensors/imu_base.h"
+#include "simulator/sensorNoise.hpp"
 
 namespace MyFusion{
 
 struct CmnsData{
     double timeStamp_;
-    Vec3d pos_;
+    Vec2d pos_; // latitude and longitude
 };
 
 class CMNS{
 public:
-    CMNS(double bias, double sigma):bias_(bias), sigma_(sigma){
-        flagInit_ = true;
+    CMNS(double bias, double sigma){
+        setParam(bias, sigma);
     }
 
     ~CMNS(){}

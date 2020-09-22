@@ -35,7 +35,6 @@
 // third_party headers
 #include <Eigen/Dense>
 #include <opencv2/opencv.hpp>
-#include <pangolin/pangolin.h>
 // custom header
 #include "constParams.h"
 // ========== type def ======== //
@@ -50,6 +49,11 @@ typedef Eigen::Vector3d Vec3d;
 typedef Eigen::Matrix3d Mat3d;
 typedef Eigen::Matrix<double, 4, 1> Vec4d;
 typedef Eigen::Matrix<double, 4, 4> Mat4d;
+typedef Eigen::Matrix<double, 6, 1> Vec6d;
+typedef Eigen::Matrix<double, 6, 6> Mat6d;
+typedef Eigen::Matrix<double, 8, 1> Vec8d;
+typedef Eigen::Matrix<double, 8, 8> Mat8d;
+
 
 typedef Eigen::Quaterniond Qd; 
 

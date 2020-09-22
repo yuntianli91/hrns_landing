@@ -1,0 +1,43 @@
+%YAML:1.0
+##############################
+dataPath: "../data/sensorSimData/"
+##############################
+imuStep: 0.005 # imu period
+##############################
+sigmaType : 2 # 0-UKf 1-CKF 2-HCKF
+##############################
+initErrP: 100 # initial position error
+initErrV: 5 # initial velocity error
+##############################
+## initial sqrt(P) 
+initSqrtP: !!opencv-matrix
+    rows: 6
+    cols: 6
+    dt: d
+    data: [100, 0, 0, 0, 0, 0,
+          0, 100, 0, 0, 0, 0,
+          0, 0, 100, 0, 0, 0,
+          0, 0, 0, 1, 0, 0,
+          0, 0, 0, 0, 1, 0,
+          0, 0, 0, 0, 0, 1]
+## initial sqrt(Q) 
+initSqrtQ: !!opencv-matrix
+    rows: 6
+    cols: 6
+    dt: d
+    data: [1, 0, 0, 0, 0, 0,
+          0, 1, 0, 0, 0, 0,
+          0, 0, 1, 0, 0, 0,
+          0, 0, 0, 0.001, 0, 0,
+          0, 0, 0, 0, 0.001, 0,
+          0, 0, 0, 0, 0, 0.001]
+## initial sqrt(R) 
+initSqrtR: !!opencv-matrix
+    rows: 5
+    cols: 5
+    dt: d
+    data: [10, 0, 0, 0, 0,
+          0, 10, 0, 0, 0,
+          0, 0, 10, 0, 0,
+          0, 0, 0, 3e-6, 0,
+          0, 0, 0, 0, 3e-6]

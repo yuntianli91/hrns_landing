@@ -15,7 +15,7 @@ namespace plt = matplotlibcpp; // matplotlib-cpp
  * @param Sigma 
  * @param idx : idx of state needed to be convert 
  * @param allX  : converted state
- * @param allP  : converted covariance
+ * @param allP  : converted covariance (3sigma)
  */
 void getForPlot(vector<vector<VecXd>> &Mu, vector<vector<MatXd>> &Sigma, int idx,
             vector<vector<double>> &allX, vector<vector<double>> &allP);
@@ -56,7 +56,7 @@ int main(int argc, char ** argv){
     int errScale = atoi(argv[1]);
 
     Eigen::VectorXd Mu0 = Vec3d::Ones() * 5.0 + (double)errScale * Vec3d(0.1,0.1,0.1);
-    Eigen::MatrixXd Sigma0 = Eigen::MatrixXd::Identity(3, 3) * 9;
+    Eigen::MatrixXd Sigma0 = Eigen::MatrixXd::Identity(3, 3) * 1;
     Eigen::MatrixXd Q0 = Eigen::MatrixXd::Identity(3, 3) * 0.001;
     Eigen::MatrixXd R0 = Eigen::MatrixXd::Identity(8, 8) * 0.01;
     // cout << Mu0 << endl << Sigma0 << endl << Q0 << endl << R0 << endl;
@@ -170,16 +170,19 @@ int main(int argc, char ** argv){
     plt::named_plot("HCKF", eHCKF[0], "--c");    
     plt::named_plot("CKF", eCKF[0], "--r");    
     plt::named_plot("UKF", eUKF[0], "--b");    
+    plt::named_plot("3sigma", pHCKF[0], "--k");    
    
     plt::subplot(3, 1, 2);
     plt::named_plot("HCKF", eHCKF[1], "--c");    
     plt::named_plot("CKF", eCKF[1], "--r");    
     plt::named_plot("UKF", eUKF[1], "--b");    
+    plt::named_plot("3sigma", pHCKF[1], "--k");    
     
     plt::subplot(3, 1, 3);
     plt::named_plot("HCKF", eHCKF[2], "--c");    
     plt::named_plot("CKF", eCKF[2], "--r");    
     plt::named_plot("UKF", eUKF[2], "--b");    
+    plt::named_plot("3sigma", pHCKF[2], "--k");    
    
     plt::show();
     // ============================================================ //
@@ -200,9 +203,9 @@ void getForPlot(vector<vector<VecXd>> &Mu, vector<vector<MatXd>> &Sigma, int idx
         tmpY.at(i) = Mu[idx][i](1);
         tmpZ.at(i) = Mu[idx][i](2);
 
-        tmpPx.at(i) = Sigma[idx][i](0);
-        tmpPy.at(i) = Sigma[idx][i](1);
-        tmpPz.at(i) = Sigma[idx][i](2);
+        tmpPx.at(i) = 3. * sqrt(Sigma[idx][i](0, 0));
+        tmpPy.at(i) = 3. * sqrt(Sigma[idx][i](1, 1));
+        tmpPz.at(i) = 3. * sqrt(Sigma[idx][i](2, 2));
     }
 
     allX.clear(); allP.clear();

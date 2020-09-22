@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.0)
 
 project(robust_fusion)
 # 设置编译选项
@@ -11,8 +11,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 # 寻找package
 find_package(OpenCV REQUIRED)
-find_package(Pangolin REQUIRED)
-find_package(Ceres REQUIRED)
 find_package(PythonLibs REQUIRED)
 
 message("OpenCV Version: ${OpenCV_VERSION}")
@@ -21,15 +19,12 @@ message("OpenCV Version: ${OpenCV_VERSION}")
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
     "/usr/include/eigen3"
-    ${Pangolin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
-    ${CERES_INCLUDE_DIRS}
     ${PYTHON_INCLUDE_DIRS}
     )
 # 设置第三方共享库
 set(THIRD_PARTY_LIBS
     ${OpenCV_LIBS}
-    ${Pangolin_LIBRARIES}    
     ${PYTHON_LIBRARIES}
     )
 

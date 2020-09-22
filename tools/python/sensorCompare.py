@@ -59,7 +59,8 @@ def getError(trajData, cmnsData):
     for i in range(0, N1):
         if(np.abs(trajData[i,0] - cmnsData[cnt,0]) < 1e-5):
             errPos[cnt,0] = cmnsData[cnt,0]
-            errPos[cnt,1:4] = cmnsData[cnt,1:4] - trajData[i,1:4]
+            errPos[cnt,1] = cmnsData[cnt,1] - trajData[i,1]
+            errPos[cnt,2] = cmnsData[cnt,2] - trajData[i,3]
             cnt = cnt + 1
             if(cnt == N2):
                 break 
@@ -69,13 +70,14 @@ def getError(trajData, cmnsData):
 trajData = pd.read_csv("../data/stdTraj/caGeo.csv").values
 imuData = pd.read_csv("../data/sensorSimData/imuData.csv").values
 virnsData = pd.read_csv("../data/sensorSimData/virnsData.csv").values
-# cmnsData = pd.read_csv("../data/sensorSimData/cmnsData.csv").values
+cmnsData = pd.read_csv("../data/sensorSimData/cmnsData.csv").values
 # cnsData = pd.read_csv("../data/sensorSimData/cnsData.csv").values
 
 dPos = getDPos(trajData, virnsData)
 trajPos = getPos(trajData, virnsData)
+pErr = getError(trajData, cmnsData)
 
-#####################################################
+# #####################################################
 colors=['tab:blue', 'tab:red']
 labels=['$\Delta p$', 'virns']
 fig1, axes = plt.subplots(3,1,figsize=(8,6))
@@ -134,5 +136,12 @@ axes[2].set_xlabel('t(s)')
 axes[2].set_ylabel('$p_z$(km)')
 
 fig2.savefig('virns.pdf')
+#####################################################
+fig3, axes = plt.subplots(2,1,figsize=(8,6))
+fig3.subplots_adjust(hspace=0.7)
+
+axes[0].plot(pErr[:,0], pErr[:,1], color=colors[0], label=labels[0])
+axes[1].plot(pErr[:,0], pErr[:,2], color=colors[1], label=labels[1])
+fig3.savefig('cmns.pdf')
 #####################################################
 plt.show()

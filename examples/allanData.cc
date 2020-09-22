@@ -1,7 +1,8 @@
 #include "simulator/sensors/imu_li.h"
-#include "utilities/io_function.hpp"
+#include "utilities/io_function.h"
 
 using namespace std;
+using namespace MyFusion;
 
 int main(int argc, char** argv){
     // generate trajectory

@@ -5,7 +5,7 @@ namespace MyFusion
 
 void CMNS::setParam(double bias, double sigma){
     bias_ = bias;
-    sigma_ = sigma;
+    sigma_ = sigma / R_m; // convert from m to rad
     flagInit_ = true;
 }
 
@@ -20,10 +20,11 @@ CmnsData CMNS::getMeasurement(ImuMotionData currMotion){
     std::default_random_engine rg(rd());
     std::normal_distribution<double> noise(0., 1.);    
 
-    Vec3d posNoise(noise(rg), noise(rg), noise(rg));
+    Vec2d posNoise(noise(rg), noise(rg));
+    Vec2d pos(currMotion.tnb_.x(), currMotion.tnb_.z());
 
     tmp.timeStamp_ = currMotion.time_stamp_;
-    tmp.pos_ = currMotion.tnb_ + sigma_ * posNoise;
+    tmp.pos_ = pos + sigma_ * posNoise;
 
     return tmp;
 }

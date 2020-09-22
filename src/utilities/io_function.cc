@@ -1,13 +1,6 @@
-#ifndef IO_FUNCTION_H_
-#define IO_FUNCTION_H_
-#include "commonHeaders.h"
-#include "simulator/sensors/imu_base.h"
-#include "simulator/sensors/cns.h"
-#include "simulator/sensors/virns.h"
-#include "simulator/sensors/cmns.h"
+#include "utilities/io_function.h"
 
-using namespace std;
-using namespace MyFusion;
+namespace MyFusion{
 
 int readImuParam(string filename, ImuParam &param){
     cv::FileStorage fsParams(filename, cv::FileStorage::READ);
@@ -41,7 +34,7 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
     fgets(header, 1024, fp);
     // 读取数据到相关容器中
     imu_data.clear();
-    printf("[1] Reading trajectory data...\n");
+    printf("[R] Reading trajectory data...\n");
     while(!feof(fp)){
         double time_stamp(0);
         double px(0.), py(0.), pz(0.);
@@ -49,8 +42,8 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
         double roll(0.), pitch(0.), yaw(0.); 
         double vx(0.), vy(0.), vz(0.);
         double wx(0.), wy(0.), wz(0.), ax(0.), ay(0.), az(0.);
-        // int ref = fscanf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le\n",
-        int ref = fscanf(fp, "%lf,%le,%lf,%le,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%le,%le,%le,%le,%le,%le\n",
+        // int ref = fscanf(fp, "%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le,%le",
+        int ref = fscanf(fp, "%lf,%le,%lf,%le,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%le,%le,%le,%le,%le,%le",
                         &time_stamp, &px, &py, &pz,
                         &qw, &qx, &qy, &qz,
                         &pitch, &yaw, &roll,
@@ -72,7 +65,7 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
 
         imu_data.emplace_back(tmp);
     }
-    cout << "[1] Totally read " << imu_data.size() << " traj data.\n";
+    cout << "[R] Totally read " << imu_data.size() << " traj data.\n";
     fclose(fp);    
 }
 
@@ -161,12 +154,12 @@ void writeCmnsData(string filename, vector<CmnsData> &cmnsData){
         return;
     }
 
-    fprintf(fp, "# time_stamp[s], p_x[m], p_y[m], p_z[m]\n"); 
+    fprintf(fp, "# time_stamp[s], lat[rad], lon[rad]\n"); 
     
     for (auto it:cmnsData){
-        fprintf(fp, "%lf,%lf,%lf,%lf\n", 
+        fprintf(fp, "%lf,%le,%le\n", 
                 it.timeStamp_, 
-                it.pos_.x(), it.pos_.y(), it.pos_.z());     
+                it.pos_.x(), it.pos_.y());     
     }
 }
 
@@ -214,27 +207,109 @@ void writeAllanData(string filename, vector<ImuMotionData> &imu_data){
 
 }
 
-void writeCNSData(string filename, vector<ImuMotionData> &cns_data){
-    FILE *fp;
-    struct stat buffer;
-    if(stat(filename.c_str(), &buffer) == 0)
-        system(("rm " + filename).c_str());    
-    fp = fopen(filename.c_str(), "w+");
-
+void readCnsData(string fileName, vector<CnsData> &cnsData){
+    // string datafile = datapath + "data_imu.csv";
+    FILE *fp = fopen((fileName).c_str(), "r");
     if (fp == nullptr){
-        cerr << "ERROR: failed to open file: " << filename << endl;
+        cerr << "ERROR: failed to open file: " << fileName << endl;
         return;
     }
+    // 跳过文件头
+    char header[1024];
+    fgets(header, 1024, fp);
+    // 读取数据到相关容器中
+    cnsData.clear();
+    printf("[R] Reading CNS data...\n");
+    while(!feof(fp)){
+        double time_stamp(0);
+        double qw(0.), qx(0.), qy(0.), qz(0.);
+        double roll(0.), pitch(0.), yaw(0.); 
+        int ref = fscanf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+                        &time_stamp, 
+                        &qw, &qx, &qy, &qz,
+                        &pitch, &yaw, &roll);
+        if(ref == -1){
+            break;
+        } // avoid read last line twicea
 
-    fprintf(fp, "#time_stamp[s],Pitch[deg],Yaw[deg],Roll[deg]\n"); 
-
-    for (auto it:cns_data){
-        fprintf(fp, "%lf,%lf,%lf,%lf\n", 
-                it.time_stamp_, it.eulerAngles_.x(), it.eulerAngles_.y(), it.eulerAngles_.z()); 
-    }   
+        CnsData tmp;
+        tmp.timeStamp_ = time_stamp;
+        tmp.qnb_ = Qd(qw, qx, qy, qz);
+        tmp.eulerAngle_ = Vec3d(pitch, yaw, roll);
+        
+        cnsData.emplace_back(tmp);
+    }
+    cout << "[R] Totally read " << cnsData.size() << " CNS data.\n";
+    fclose(fp);    
 }
 
+void readVirnsData(string fileName, vector<VirnsData> &virnsData){
+    // string datafile = datapath + "data_imu.csv";
+    FILE *fp = fopen((fileName).c_str(), "r");
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << fileName << endl;
+        return;
+    }
+    // 跳过文件头
+    char header[1024];
+    fgets(header, 1024, fp);
+    // 读取数据到相关容器中
+    virnsData.clear();
+    printf("[R] Reading VIRNS data...\n");
+    while(!feof(fp)){
+        double time_stamp(0);
+        double dPx(0.), dPy(0.), dPz(0.);
+        double px(0.), py(0.), pz(0.); 
+        int ref = fscanf(fp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+                        &time_stamp, 
+                        &dPx, &dPy, &dPz,
+                        &px, &py, &pz);
+        if(ref == -1){
+            break;
+        } // avoid read last line twicea
 
+        VirnsData tmp;
+        tmp.timeStamp_ = time_stamp;
+        tmp.dPos_ = Vec3d(dPx, dPy, dPz);
+        tmp.pos_ = Vec3d(px, py, pz);
+        
+        virnsData.emplace_back(tmp);
+    }
+    cout << "[R] Totally read " << virnsData.size() << " VIRNS data.\n";
+    fclose(fp);    
+}
+
+void readCmnsData(string fileName, vector<CmnsData> &cmnsData){
+    // string datafile = datapath + "data_imu.csv";
+    FILE *fp = fopen((fileName).c_str(), "r");
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << fileName << endl;
+        return;
+    }
+    // 跳过文件头
+    char header[1024];
+    fgets(header, 1024, fp);
+    // 读取数据到相关容器中
+    cmnsData.clear();
+    printf("[R] Reading CMNS data...\n");
+    while(!feof(fp)){
+        double time_stamp(0);
+        double lat(0.), lon(0.); 
+        int ref = fscanf(fp, "%lf,%le,%le\n",
+                        &time_stamp, &lat, &lon);
+        if(ref == -1){
+            break;
+        } // avoid read last line twicea
+
+        CmnsData tmp;
+        tmp.timeStamp_ = time_stamp;
+        tmp.pos_ = Vec2d(lat, lon);
+
+        cmnsData.emplace_back(tmp);        
+    }
+    cout << "[R] Totally read " << cmnsData.size() << " CMNS data.\n";
+    fclose(fp);    
+}
 
 /**
  * @brief print percentage of progress
@@ -259,6 +334,7 @@ void printPer(string name, int per){
     fflush(stdout);
 }
 
+} // namespace MyFusion
 
 
-#endif
+// #endif

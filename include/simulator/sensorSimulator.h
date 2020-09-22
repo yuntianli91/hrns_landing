@@ -2,7 +2,7 @@
 #define SENSOR_SIMULATOR_H_
 #include "commonHeaders.h"
 #include "utilities/utilities.hpp"
-#include "utilities/io_function.hpp"
+#include "utilities/io_function.h"
 #include "simulator/sensors/imu_g.h"
 #include "simulator/sensors/cns.h"
 #include "simulator/sensors/cmns.h"
