@@ -63,9 +63,7 @@ int main(int argc, char ** argv){
     
     SCSPKF mySCHCKF(Mu0, Sigma0, Q0, R0, SP_HCKF);
     SCSPKF mySCCKF(Mu0, Sigma0, Q0, R0, SP_CKF);
-    SCSPKF mySCUKF(Mu0, Sigma0, Q0, R0, SP_UKF);
-
-    mySCUKF.setUKFParams(0.001, 2, 0);
+    SCSPKF mySCUKF(Mu0, Sigma0, Q0, R0, 0.001, 2, 0, SP_UKF);
 
     vector<vector<VecXd>> all_err;
     vector<vector<VecXd>> all_mu;

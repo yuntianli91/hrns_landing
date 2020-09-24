@@ -34,7 +34,7 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
     fgets(header, 1024, fp);
     // 读取数据到相关容器中
     imu_data.clear();
-    printf("[R] Reading trajectory data...\n");
+    printf("[1] Reading trajectory data...\n");
     while(!feof(fp)){
         double time_stamp(0);
         double px(0.), py(0.), pz(0.);
@@ -65,7 +65,7 @@ void readImuMotionData(string filename, vector<ImuMotionData> &imu_data){
 
         imu_data.emplace_back(tmp);
     }
-    cout << "[R] Totally read " << imu_data.size() << " traj data.\n";
+    cout << "[1] Totally read " << imu_data.size() << " traj data.\n";
     fclose(fp);    
 }
 
@@ -163,6 +163,27 @@ void writeCmnsData(string filename, vector<CmnsData> &cmnsData){
     }
 }
 
+void writeAltData(string filename, vector<AltData> &altData){
+    FILE *fp;
+    struct stat buffer;
+    if(stat(filename.c_str(), &buffer) == 0)
+        system(("rm " + filename).c_str());    
+    fp = fopen(filename.c_str(), "w+");
+
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << filename << endl;
+        return;
+    }
+
+    fprintf(fp, "# time_stamp[s], range[m]\n"); 
+    
+    for (auto it:altData){
+        fprintf(fp, "%lf,%lf\n", 
+                it.timeStamp_, it.range_);     
+    }
+}
+
+
 void writePos(string filename, vector<ImuMotionData> &imu_data){
     FILE *fp;
     struct stat buffer;
@@ -219,7 +240,7 @@ void readCnsData(string fileName, vector<CnsData> &cnsData){
     fgets(header, 1024, fp);
     // 读取数据到相关容器中
     cnsData.clear();
-    printf("[R] Reading CNS data...\n");
+    printf("[1] Reading CNS data...\n");
     while(!feof(fp)){
         double time_stamp(0);
         double qw(0.), qx(0.), qy(0.), qz(0.);
@@ -239,7 +260,7 @@ void readCnsData(string fileName, vector<CnsData> &cnsData){
         
         cnsData.emplace_back(tmp);
     }
-    cout << "[R] Totally read " << cnsData.size() << " CNS data.\n";
+    cout << "[1] Totally read " << cnsData.size() << " CNS data.\n";
     fclose(fp);    
 }
 
@@ -255,7 +276,7 @@ void readVirnsData(string fileName, vector<VirnsData> &virnsData){
     fgets(header, 1024, fp);
     // 读取数据到相关容器中
     virnsData.clear();
-    printf("[R] Reading VIRNS data...\n");
+    printf("[1] Reading VIRNS data...\n");
     while(!feof(fp)){
         double time_stamp(0);
         double dPx(0.), dPy(0.), dPz(0.);
@@ -275,7 +296,7 @@ void readVirnsData(string fileName, vector<VirnsData> &virnsData){
         
         virnsData.emplace_back(tmp);
     }
-    cout << "[R] Totally read " << virnsData.size() << " VIRNS data.\n";
+    cout << "[1] Totally read " << virnsData.size() << " VIRNS data.\n";
     fclose(fp);    
 }
 
@@ -291,7 +312,7 @@ void readCmnsData(string fileName, vector<CmnsData> &cmnsData){
     fgets(header, 1024, fp);
     // 读取数据到相关容器中
     cmnsData.clear();
-    printf("[R] Reading CMNS data...\n");
+    printf("[1] Reading CMNS data...\n");
     while(!feof(fp)){
         double time_stamp(0);
         double lat(0.), lon(0.); 
@@ -307,7 +328,40 @@ void readCmnsData(string fileName, vector<CmnsData> &cmnsData){
 
         cmnsData.emplace_back(tmp);        
     }
-    cout << "[R] Totally read " << cmnsData.size() << " CMNS data.\n";
+    cout << "[1] Totally read " << cmnsData.size() << " CMNS data.\n";
+    fclose(fp);    
+}
+
+
+void readAltData(string fileName, vector<AltData> &altData){
+    // string datafile = datapath + "data_imu.csv";
+    FILE *fp = fopen((fileName).c_str(), "r");
+    if (fp == nullptr){
+        cerr << "ERROR: failed to open file: " << fileName << endl;
+        return;
+    }
+    // 跳过文件头
+    char header[1024];
+    fgets(header, 1024, fp);
+    // 读取数据到相关容器中
+    altData.clear();
+    printf("[1] Reading CMNS data...\n");
+    while(!feof(fp)){
+        double time_stamp(0);
+        double range(0.); 
+        int ref = fscanf(fp, "%lf,%lf\n",
+                        &time_stamp, &range);
+        if(ref == -1){
+            break;
+        } // avoid read last line twicea
+
+        AltData tmp;
+        tmp.timeStamp_ = time_stamp;
+        tmp.range_ = range;
+
+        altData.emplace_back(tmp);        
+    }
+    cout << "[1] Totally read " << altData.size() << " Altimeter data.\n";
     fclose(fp);    
 }
 

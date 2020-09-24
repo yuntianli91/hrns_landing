@@ -4,7 +4,10 @@ dataPath: "../data/sensorSimData/"
 ##############################
 imuStep: 0.005 # imu period
 ##############################
-sigmaType : 2 # 0-UKf 1-CKF 2-HCKF
+sigmaType : 1 # 0-UKf 1-CKF 2-HCKF
+alpha: 0.001 # ukf parameters
+beta: 2 # ukf parameters
+kappa: 0 # ukf parameters
 ##############################
 initErrP: 100 # initial position error
 initErrV: 5 # initial velocity error
@@ -14,30 +17,31 @@ initSqrtP: !!opencv-matrix
     rows: 6
     cols: 6
     dt: d
-    data: [100, 0, 0, 0, 0, 0,
+    data: [5.0e-5, 0, 0, 0, 0, 0,
           0, 100, 0, 0, 0, 0,
-          0, 0, 100, 0, 0, 0,
-          0, 0, 0, 1, 0, 0,
-          0, 0, 0, 0, 1, 0,
-          0, 0, 0, 0, 0, 1]
+          0, 0, 5.0e-5, 0, 0, 0,
+          0, 0, 0, 5, 0, 0,
+          0, 0, 0, 0, 5, 0,
+          0, 0, 0, 0, 0, 5]
 ## initial sqrt(Q) 
 initSqrtQ: !!opencv-matrix
     rows: 6
     cols: 6
     dt: d
-    data: [1, 0, 0, 0, 0, 0,
+    data: [5.7e-7, 0, 0, 0, 0, 0,
           0, 1, 0, 0, 0, 0,
-          0, 0, 1, 0, 0, 0,
-          0, 0, 0, 0.001, 0, 0,
-          0, 0, 0, 0, 0.001, 0,
-          0, 0, 0, 0, 0, 0.001]
+          0, 0, 5.7e-7, 0, 0, 0,
+          0, 0, 0, 3.0e-4, 0, 0,
+          0, 0, 0, 0, 3.0e-4, 0,
+          0, 0, 0, 0, 0, 3.0e-4]
 ## initial sqrt(R) 
 initSqrtR: !!opencv-matrix
-    rows: 5
-    cols: 5
+    rows: 6
+    cols: 6
     dt: d
-    data: [10, 0, 0, 0, 0,
-          0, 10, 0, 0, 0,
-          0, 0, 10, 0, 0,
-          0, 0, 0, 3e-6, 0,
-          0, 0, 0, 0, 3e-6]
+    data: [30, 0, 0, 0, 0, 0,
+          0, 30, 0, 0, 0, 0,
+          0, 0, 30, 0, 0, 0,
+          0, 0, 0, 1.0e-5, 0, 0,
+          0, 0, 0, 0, 1.0e-5, 0,
+          0, 0, 0, 0, 0, 3]

@@ -18,8 +18,9 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     SCSPKF(){} // default constructor
     SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType=SP_HCKF);
+    SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, double alpha, double beta, double kappa, SampleType sigmaType=SP_UKF);
     void initSCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType);
-    void setUKFParams(double alpha, double beta, double kappa);
+    // void setUKFParams(double alpha, double beta, double kappa);
     // ------ filter functions ------ //
     void genSigmaPoints(vector<VecXd> &sPoints, bool aug=0);
     // void genSigmaPointsCKF(vector<VecXd> &sPoints);
@@ -46,6 +47,8 @@ public:
     // ------ io and debug functions ------ //
     void printSi(vector<VecXd> allSi, string name, int maxPerRow);
     void printWeight(vector<double> allWeight, string name, int maxPerRow);
+    void setSigmaType(SampleType type){sigmaType_ = type;}
+    SampleType getSigmaType(){return sigmaType_;}
 
 protected:
     SampleType sigmaType_; // type of sigma points

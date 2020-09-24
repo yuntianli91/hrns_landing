@@ -6,8 +6,21 @@ SCSPKF::SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType):SC
     initSCSPKF(Mu, Sigma, Q, R, sigmaType);
 }
 
+SCSPKF::SCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, double alpha, double beta, double kappa, SampleType sigmaType):SCKF(Mu, Sigma, Q, R){
+    alpha_ = alpha;
+    beta_ = beta;
+    kappa_ = kappa;
+    lambda_ = 3 * alpha_ * alpha_ - xSize_; 
+
+    initSCSPKF(Mu, Sigma, Q, R, sigmaType);
+
+    ukfInit_ = true; 
+}
+
 void SCSPKF::initSCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigmaType){
     sigmaType_ = sigmaType;
+    if(sigmaType_ == SP_UKF)
+        printf("[UKF] Parameters: alpha (%lf), beta (%lf), kappa (%lf).\n", alpha_, beta_, kappa_);
     // compute weight
     computeWeight(weightMu_, weightSigma_, xSize_); // calculate weight of state
     computeWeight(weightMuAug_, weightSigmaAug_, 2 * xSize_); // calculate weight of augState
@@ -19,17 +32,19 @@ void SCSPKF::initSCSPKF(VecXd Mu, MatXd Sigma, MatXd Q, MatXd R, SampleType sigm
     // printSi(allSi_, varName(allsi_), 20);
     // printWeight(weightMuAug_, varName(weightMuAug_), 20);
     // printSi(allSiAug_, varName(allSiAug_), 20);
+
+    siInit_ = true;
 }
 
-void SCSPKF::setUKFParams(double alpha, double beta, double kappa){
-    alpha_ = alpha;
-    beta_ = beta;
-    kappa_ = kappa;
-    lambda_ = 3 * alpha_ * alpha_ - xSize_; 
+// void SCSPKF::setUKFParams(double alpha, double beta, double kappa){
+//     alpha_ = alpha;
+//     beta_ = beta;
+//     kappa_ = kappa;
+//     lambda_ = 3 * alpha_ * alpha_ - xSize_; 
 
-    ukfInit_ = true;
-    printf("[UKF] Parameters: alpha (%lf), beta (%lf), kappa (%lf).\n", alpha_, beta_, kappa_);
-}
+//     ukfInit_ = true;
+//     // printf("[UKF] Parameters: alpha (%lf), beta (%lf), kappa (%lf).\n", alpha_, beta_, kappa_);
+// }
 
 void SCSPKF::genSigmaPoints(vector<VecXd> &sPoints, bool aug){
     if(sPoints.size() != 0)
@@ -73,7 +88,10 @@ void SCSPKF::genSi(vector<VecXd> &allSi, int xSize){
 }
 
 void SCSPKF::genSiUKF(vector<VecXd> &allSi, int xSize){
+    
+    cout << "UKF lambda: " << lambda_ << endl;
     gamma_ = sqrt(xSize + lambda_);
+    cout << "UKF gamma: " << gamma_ << endl;
     if (allSi.size() != 0)
          allSi.clear();
     // 0
@@ -272,6 +290,7 @@ void SCSPKF::oneStepPrediction(VecXd &U){
     // calculate mean and covariance
     Mu_ = calcWeightedMean(sPointsY_, weightMu_);
     Sigma_ = calcWeightedCov(sPointsY_, weightMu_ , weightSigma_) + Q_;
+    // cout << "Sigma:\n" << Sigma_ << endl;
     // compute Jacobian with statistical linearization
     MatXd SigmaXY = calcWeightedCrossCov(sPointsX_, sPointsY_, weightMu_ , weightSigma_);
     MatXd F = SigmaXY.transpose() * Sigma_.inverse(); // F = Pyx * Pxx_inv
@@ -296,21 +315,26 @@ void SCSPKF::oneStepUpdate(VecXd &Z){
     // clear container
     sPointsX_.clear();
     sPointsY_.clear();
+
+    // cout << "augSigma_:\n" << augSigma_ << endl; 
     // generate sigma points
     genSigmaPoints(sPointsX_, true);
     // propagate sigma points
     updateFcn(sPointsX_, sPointsY_);
     VecXd tmpZ = calcWeightedMean(sPointsY_, weightMuAug_);
     MatXd SigmaZZ = calcWeightedCov(sPointsY_, weightMuAug_, weightSigmaAug_) + curR_;
+    // cout << "ZZ:\n" << SigmaZZ << endl;
     MatXd SigmaXZ = calcWeightedCrossCov(sPointsX_, sPointsY_, weightMuAug_, weightSigmaAug_);
+    // cout << "XZ:\n" << SigmaXZ << endl;
     // compute Kalman gain
     MatXd K = SigmaXZ * SigmaZZ.inverse();
+    // cout << "K:\n" << K << endl;
     residual_ = Z - tmpZ;
     // update augment state and covariance
     augMu_ += K * residual_;
     augSigma_ -= K * SigmaZZ * K.transpose();
     // margliza old state
-    Mu_ = augMu_.segment(0, xSize_);
+    Mu_ = augMu_.segment(xSize_, xSize_);
     Sigma_ = augSigma_.block(xSize_, xSize_, xSize_, xSize_);
     // reset state
     lastMu_ = Mu_;

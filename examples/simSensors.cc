@@ -28,5 +28,9 @@ int main(int argc, char** argv){
     mySimulator.simCMNS(trajData, cmnsData);
     writeCmnsData("../data/sensorSimData/cmnsData.csv", cmnsData);
 
+    vector<AltData> altData;
+    mySimulator.simAltimeter(trajData, altData);
+    writeAltData("../data/sensorSimData/altData.csv", altData);
+
     return 0;
 }

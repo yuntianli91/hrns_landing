@@ -7,6 +7,7 @@ add_library(myFusion SHARED
             simulator/sensors/cns.cc
             simulator/sensors/virns.cc
             simulator/sensors/cmns.cc
+            simulator/sensors/altimeter.cc
             simulator/sensorSimulator.cc
             backend/backParam.cc
             backend/spkf.cc

@@ -2,7 +2,10 @@
 #define ESTIMATOR_BACK_H_
 #include "backend/sckf/pdSCSPKF.h"
 #include "utilities/io_function.h"
+#include "utilities/utilities.hpp"
+#include <matplotlibcpp.h>
 
+namespace plt = matplotlibcpp;
 namespace MyFusion
 {
 
@@ -26,18 +29,31 @@ public:
      * @param allZ : queue of all measurement vectors 
      * @param virnsData : data of visual-inertial relative navigation system
      * @param cmnsData : data of crater matching navigation system
+     * @param altData : data of altimeter
      */
-    void extractZ(queue<VecXd> &allZ, const vector<VirnsData> &virnsData, const vector<CmnsData> cmnsData);
+    void extractZ(queue<VecXd> &allZ, const vector<VirnsData> &virnsData, const vector<CmnsData> &cmnsData, const vector<AltData> &altData);
 
-    void processBackend();
+    void processBackend(double time=0);
+
     // ========== other functions ========= //
     template <typename T>
     void clearQueue(queue<T> &Q);
 
+    void writeResults(string fileName, const vector<pair<double, VecXd>> allMu, 
+            const vector<pair<double, MatXd>> allSigma, 
+            const vector<pair<double, Qd>> allQnb);
+    void writeResults(string fileName, const vector<pair<double, VecXd>> allMu, const vector<pair<double, MatXd>> allSigma);
+
+    void showResults();
+    void setOutFile(string fileName){outFile_ = fileName;}
+    void setSigmaType(int type){sigmaType_ = SampleType(type);}
+    
 protected:
+    vector<ImuMotionData> trajData_; // traj data
     queue<VecXd> allU_, allZ_; // container of all control and measurement vectors
-    vector<VecXd> allMu; // estimated mean
-    vector<MatXd> allSigma; // estimated covariance
+    vector<pair<double, VecXd>> allMu_; // estimated mean
+    vector<pair<double, MatXd>> allSigma_; // estimated covariance
+    vector<pair<double, Qd>> allQnb_;
 
     int dataSize_; // size of all control vector
     bool dataInitiated_ = false; // estimator has been initiated or not
@@ -46,6 +62,8 @@ protected:
     MatXd Sigma0_, Q0_, R0_;
     SampleType sigmaType_;
     PdSCSPKF *filterPtr_; // pointer of filter
+
+    string outFile_;
 };
     
 } // namespace MyFusion

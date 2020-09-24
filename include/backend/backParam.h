@@ -10,8 +10,9 @@ namespace MyFusion{
 extern double IMU_STEP;
 extern double INIT_ERR_P, INIT_ERR_V;
 extern MatXd INIT_SQRT_P, INIT_SQRT_Q, INIT_SQRT_R;
-extern string IMU_FILE, CNS_FILE, VIRNS_FILE, CMNS_FILE;
+extern string IMU_FILE, CNS_FILE, VIRNS_FILE, CMNS_FILE, ALT_FILE;
 extern int SIGMA_TYPE;
+extern double UKF_A, UKF_B, UKF_K;
 
 // load backend parameters
 void loadBackParam(string configFile);

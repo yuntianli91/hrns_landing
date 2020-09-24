@@ -7,6 +7,7 @@
 #include "simulator/sensors/cns.h"
 #include "simulator/sensors/cmns.h"
 #include "simulator/sensors/virns.h"
+#include "simulator/sensors/altimeter.h"
 
 using namespace std;
 
@@ -29,6 +30,9 @@ struct SensorParams
     // cmns parameters
     double cmns_sigma_;
     double cmns_step_;
+    // altimeter parameters
+    double alt_sigma_;
+    double alt_step_;
 };
 
 
@@ -49,7 +53,7 @@ public:
      * @param trajData 
      * @param imuData 
      */
-    void simIMU(const vector<ImuMotionData> trajData, vector<ImuMotionData> &imuData);
+    void simIMU(const vector<ImuMotionData> &trajData, vector<ImuMotionData> &imuData);
     
     /**
      * @brief 
@@ -57,7 +61,7 @@ public:
      * @param trajData 
      * @param cnsData 
      */
-    void simCNS(const vector<ImuMotionData> trajData, vector<CnsData> &cnsData);
+    void simCNS(const vector<ImuMotionData> &trajData, vector<CnsData> &cnsData);
     
     /**
      * @brief 
@@ -65,7 +69,7 @@ public:
      * @param trajData 
      * @param virnsData 
      */
-    void simVIRNSRelative(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData);
+    void simVIRNSRelative(const vector<ImuMotionData> &trajData, vector<VirnsData> &virnsData);
 
     /**
      * @brief 
@@ -73,7 +77,7 @@ public:
      * @param trajData 
      * @param virnsData 
      */
-    void simVIRNS(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData);
+    void simVIRNS(const vector<ImuMotionData> &trajData, vector<VirnsData> &virnsData);
     
     /**
      * @brief 
@@ -81,7 +85,9 @@ public:
      * @param trajData 
      * @param cmnsData 
      */
-    void simCMNS(const vector<ImuMotionData> trajData, vector<CmnsData> &cmnsData);
+    void simCMNS(const vector<ImuMotionData> &trajData, vector<CmnsData> &cmnsData);
+
+    void simAltimeter(const vector<ImuMotionData> &trajData, vector<AltData> &altData);
 
     SensorParams sensorParams_;
     

@@ -13,9 +13,9 @@ void IMU_G::oneStepIntegration(){
     double curLon = tnb_.z(); // current longitude
     double h_m = R_m + curAlt; // (R_m + h)
 
-    // compute w^G_im = [W_im * cosL, 0, -W_m * sinL]
+    // compute w^G_im = [W_im * cosL, -W_m * sinL, 0]
     Vec3d w_im(W_im * cos(curLat), W_im * sin(curLat), 0.);
-    // compute w^G_mg = [v_e / h_m, -v_n / h_m, -v_e * tanL / h_m]
+    // compute w^G_mg = [v_e / h_m, v_e * tanL / h_m, -v_n / h_m, ]
     Vec3d w_mg(vel_.z() / h_m,
              vel_.z() * tan(curLat) / h_m, 
              -vel_.x() / h_m);

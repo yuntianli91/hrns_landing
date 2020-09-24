@@ -34,7 +34,10 @@ void SensorSimulator::readSensorParameters(string configFile){
         // cmns parameters
         sensorParams_.cmns_step_ = fsParams["cmns_step"];
         sensorParams_.cmns_sigma_ = fsParams["cmns_n"];
-        //
+        // altimeter parameters
+        sensorParams_.alt_step_ = fsParams["alt_step"];
+        sensorParams_.alt_sigma_ = fsParams["alt_n"];
+
         paramInitialized_ = true;
 
         showParameters(sensorParams_);
@@ -56,7 +59,7 @@ void SensorSimulator::showParameters(SensorParams params){
     printf("  Noise:%lf.\n", params.cmns_sigma_);
 }
 
-void SensorSimulator::simIMU(const vector<ImuMotionData> trajData, vector<ImuMotionData> &imuData){
+void SensorSimulator::simIMU(const vector<ImuMotionData> &trajData, vector<ImuMotionData> &imuData){
     ImuParam tmpParam;
     tmpParam.time_step_ = sensorParams_.imu_step_;
     tmpParam.acc_b_ = sensorParams_.acc_b_; tmpParam.gyr_b_ = sensorParams_.gyr_b_;
@@ -79,7 +82,7 @@ void SensorSimulator::simIMU(const vector<ImuMotionData> trajData, vector<ImuMot
     printf("\n");
 }
 
-void SensorSimulator::simCNS(const vector<ImuMotionData> trajData, vector<CnsData> &cnsData){
+void SensorSimulator::simCNS(const vector<ImuMotionData> &trajData, vector<CnsData> &cnsData){
     CNS cnsSimulator(0., sensorParams_.cns_sigma_);
     
     cnsData.clear();
@@ -100,12 +103,13 @@ void SensorSimulator::simCNS(const vector<ImuMotionData> trajData, vector<CnsDat
     printf("\n");
 }
 
-void SensorSimulator::simVIRNSRelative(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData){
+void SensorSimulator::simVIRNSRelative(const vector<ImuMotionData> &trajData, vector<VirnsData> &virnsData){
     VIRNS virnsSimulator(0., sensorParams_.virns_sigma_);
     
     virnsData.clear();
     double lastTime = 0.0;
     int totalSize = trajData.size();
+    VirnsData tmp = virnsSimulator.getRelativeMeasurement(trajData[0]);
     for(size_t i = 0; i < totalSize; i++){
         int per = (i + 1) * 100 / totalSize;
         printPer("Generating VIRNS relative measurements in MCMF", per);
@@ -113,7 +117,7 @@ void SensorSimulator::simVIRNSRelative(const vector<ImuMotionData> trajData, vec
         if (abs(trajData[i].time_stamp_ - lastTime - sensorParams_.virns_step_) > 1e-5)
             continue;
         
-        VirnsData tmp = virnsSimulator.getRelativeMeasurement(trajData[i]);
+        tmp = virnsSimulator.getRelativeMeasurement(trajData[i]);
         virnsData.emplace_back(tmp);
         lastTime = trajData[i].time_stamp_;
    }
@@ -121,7 +125,7 @@ void SensorSimulator::simVIRNSRelative(const vector<ImuMotionData> trajData, vec
     printf("\n");
 }
 
-void SensorSimulator::simVIRNS(const vector<ImuMotionData> trajData, vector<VirnsData> &virnsData){
+void SensorSimulator::simVIRNS(const vector<ImuMotionData> &trajData, vector<VirnsData> &virnsData){
     // generate relative measurements
     simVIRNSRelative(trajData, virnsData);
     // generate absolute measurements
@@ -140,12 +144,15 @@ void SensorSimulator::simVIRNS(const vector<ImuMotionData> trajData, vector<Virn
     printf("\n");
 }
 
-void SensorSimulator::simCMNS(const vector<ImuMotionData> trajData, vector<CmnsData> &cmnsData){
+void SensorSimulator::simCMNS(const vector<ImuMotionData> &trajData, vector<CmnsData> &cmnsData){
     CMNS cmnsSimulator(0., sensorParams_.cmns_sigma_);
 
     cmnsData.clear();
     double lastTime = 0.0;
     int totalSize = trajData.size();
+    
+    // CmnsData tmp = cmnsSimulator.getMeasurement(trajData[0]);
+    // cmnsData.emplace_back(tmp);
     for(size_t i = 0; i < totalSize; i++){
         int per = (i + 1) * 100 / totalSize;
         printPer("Generating CMNS measurements in MCMF", per);
@@ -157,6 +164,29 @@ void SensorSimulator::simCMNS(const vector<ImuMotionData> trajData, vector<CmnsD
         cmnsData.emplace_back(tmp);
         lastTime = trajData[i].time_stamp_;
    }
+    // change line
+    printf("\n");
+}
+
+void SensorSimulator::simAltimeter(const vector<ImuMotionData> &trajData, vector<AltData> &altData){
+    Altimeter altSimulator(0, sensorParams_.alt_sigma_);
+
+    altData.clear();
+    double lastTime = 0.0;
+    int totalSize = trajData.size();
+
+    for(size_t i = 0; i < totalSize; i++){
+        int per = (i + 1) * 100 / totalSize;
+        printPer("Generating Altimeter measurements in GEO", per);
+ 
+        if (abs(trajData[i].time_stamp_ - lastTime -sensorParams_.alt_step_) > 1e-5)
+          continue;
+
+        AltData tmp = altSimulator.getMeasurement(trajData[i]);
+        altData.emplace_back(tmp);
+        lastTime = trajData[i].time_stamp_;
+    }
+    
     // change line
     printf("\n");
 }

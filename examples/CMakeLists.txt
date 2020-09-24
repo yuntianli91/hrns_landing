@@ -19,7 +19,7 @@ target_link_libraries(glintDemo myFusion ${THIRD_PARTY_LIBS})
 add_executable(scspkfDemo scspkfDemo.cc)
 target_link_libraries(scspkfDemo myFusion ${THIRD_PARTY_LIBS})
 
-# add_executable(scFusion scFusion.cc)
-# target_link_libraries(scFusion myFusion ${THIRD_PARTY_LIBS})
+add_executable(scFusion scFusion.cc)
+target_link_libraries(scFusion myFusion ${THIRD_PARTY_LIBS})
 
 
