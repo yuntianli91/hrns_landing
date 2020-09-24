@@ -28,6 +28,7 @@ public:
     // ------ io functions ------ //
     VecXd getMu(){return Mu_;}
     MatXd getSigma(){return Sigma_;}
+    void setUpdateType(int updateType){updateType_ = updateType;}
 
 
 protected:
@@ -42,7 +43,7 @@ protected:
     int curMSize_; // current measurement size
 
     bool flagInitialized_ = false;
-    bool flagSC_ = true;
+    int updateType_ = 2;
 };
 
 } // namespace MyFusion

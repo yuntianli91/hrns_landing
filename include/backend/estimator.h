@@ -12,7 +12,7 @@ namespace MyFusion
 class Estimator{
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    Estimator(string configFile);
+    Estimator(string configFile, int updateType);
     ~Estimator();
     void initEstimator(string configFile);
 
@@ -63,8 +63,11 @@ protected:
     SampleType sigmaType_;
     PdSCSPKF *filterPtr_; // pointer of filter
 
-    bool flagSC_ = 1; // flag of stochastic cloning
-
+    int updateType_ = 2; // type of update 
+    VecXd lastZA_ ; // Z for accumulative measurement
+    int sizeMr_ = 3; // size of relative measurements
+    int sizeMa_ = 3; // size of absolute measurements
+    
     string outFile_;
 };
     

@@ -31,7 +31,7 @@ def calcError(trajdata, filterdata):
     pos_0 = trajdata.iloc[:, 1:4].values
     pos_1 = filterdata.iloc[:, 1:4].values
 
-    vel_0 = trajdata.iloc[:, 8:11].values
+    vel_0 = trajdata.iloc[:, 11:14].values
     vel_1 = filterdata.iloc[:, 4:7].values
     
     time_0 = trajdata.iloc[:,0].values
@@ -71,8 +71,8 @@ def calcRMSE(err, dim):
 #################### 读取数据（csv格式） ########################
 trajData = pd.read_csv('../data/stdTraj/caGeo.csv')
 imuData = pd.read_csv('../data/sensorSimData/imuData.csv')
-filter1Data = pd.read_csv('../output/ckf.csv')
-filter2Data = pd.read_csv('../output/ukf.csv')
+filter1Data = pd.read_csv('../output/ckfAA.csv')
+filter2Data = pd.read_csv('../output/ckfAR.csv')
 
 errFilter1 = calcError(trajData, filter1Data)
 errFilter2 = calcError(trajData, filter2Data)
@@ -84,26 +84,26 @@ colors = ['tab:blue','tab:red']
 fig1, axes = plt.subplots(3, 1, figsize=(8,6))
 fig1.subplots_adjust(hspace=0.7)
 
-axes[0].plot(errFilter1[:,0], errFilter1[:,1] , color=colors[0])
-axes[0].plot(errFilter2[:,0], errFilter2[:,1] , color=colors[1])
+axes[0].plot(errFilter1[:,0], abs(errFilter1[:,1]) , color=colors[0])
+axes[0].plot(errFilter2[:,0], abs(errFilter2[:,1]) , color=colors[1])
 
-axes[1].plot(errFilter1[:,0], errFilter1[:,2] , color=colors[0])
-axes[1].plot(errFilter2[:,0], errFilter2[:,2] , color=colors[1])
+axes[1].plot(errFilter1[:,0], abs(errFilter1[:,2]) , color=colors[0])
+axes[1].plot(errFilter2[:,0], abs(errFilter2[:,2]) , color=colors[1])
 
-axes[2].plot(errFilter1[:,0], errFilter1[:,3] , color=colors[0])
-axes[2].plot(errFilter2[:,0], errFilter2[:,3] , color=colors[1])
+axes[2].plot(errFilter1[:,0], abs(errFilter1[:,3]) , color=colors[0])
+axes[2].plot(errFilter2[:,0], abs(errFilter2[:,3]) , color=colors[1])
 # ####################################################
 fig2, axes = plt.subplots(3, 1, figsize=(8,6))
 fig2.subplots_adjust(hspace=0.7)
 
-axes[0].plot(errFilter1[:,0], errFilter1[:,4] , color=colors[0])
-axes[0].plot(errFilter2[:,0], errFilter2[:,4] , color=colors[1])
+axes[0].plot(errFilter1[:,0], abs(errFilter1[:,4]) , color=colors[0])
+axes[0].plot(errFilter2[:,0], abs(errFilter2[:,4]) , color=colors[1])
 
-axes[1].plot(errFilter1[:,0], errFilter1[:,5] , color=colors[0])
-axes[1].plot(errFilter2[:,0], errFilter2[:,5] , color=colors[1])
+axes[1].plot(errFilter1[:,0], abs(errFilter1[:,5]) , color=colors[0])
+axes[1].plot(errFilter2[:,0], abs(errFilter2[:,5]) , color=colors[1])
 
-axes[2].plot(errFilter1[:,0], errFilter1[:,6] , color=colors[0])
-axes[2].plot(errFilter2[:,0], errFilter2[:,6] , color=colors[1])
+axes[2].plot(errFilter1[:,0], abs(errFilter1[:,6]) , color=colors[0])
+axes[2].plot(errFilter2[:,0], abs(errFilter2[:,6]) , color=colors[1])
 
 
 

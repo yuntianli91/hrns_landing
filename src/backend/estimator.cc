@@ -2,7 +2,8 @@
 
 namespace MyFusion{
 
-Estimator::Estimator(string configFile){
+Estimator::Estimator(string configFile, int updateType){
+    updateType_ = updateType;
     initEstimator(configFile);
 }
 Estimator::~Estimator(){
@@ -28,10 +29,11 @@ void Estimator::initEstimator(string configFile){
     readCmnsData(CMNS_FILE, cmnsData);
     readAltData(ALT_FILE, altData);
 
+    
     // extract U and Z
     extractU(allU_, imuData);
     extractZ(allZ_, virnsData, cmnsData, altData);
-    
+    lastZA_ = FrameConvert::geo2mcmf(imuData[0].tnb_);
     // allZ_.pop(); // pop first measurement as it is zero
     // ---------- initiate other parameters ---------- //
     dataSize_ = allU_.size();
@@ -79,28 +81,41 @@ void Estimator::extractZ(queue<VecXd> &allZ, const vector<VirnsData> &virnsData,
     if(!allZ.empty())
         clearQueue(allZ);
 
-    int cnt = 0;
-    double t2 = cmnsData[cnt].timeStamp_;
-    for(auto it : virnsData){
-        VecXd tmp;
-        double t1 = it.timeStamp_;
-        if(abs(t1 - t2) < 1e-5){
-            tmp = VecXd::Zero(7); // [t, dx, dy, dz, L, l, h]
-            tmp(0) = it.timeStamp_;
-            tmp.segment(1, 3) = it.dPos_;
-            tmp.segment(4, 2) = cmnsData[cnt].pos_; 
-            tmp(6) = altData[cnt].range_;
-            cnt++;
+    
+    if(updateType_ == 0){
+        for(size_t i = 0; i < cmnsData.size(); i++){
+            VecXd tmp = VecXd::Zero(4); // [L, l, h]
+            tmp(0) = cmnsData[i].timeStamp_;
+            tmp(1) = cmnsData[i].pos_.x();
+            tmp(2) = cmnsData[i].pos_.y();
+            tmp(3) = altData[i].range_;
 
-            t2 = cmnsData[cnt].timeStamp_;
+            allZ.push(tmp);
         }
-        else{
-            tmp = VecXd::Zero(4); // [t, dx, dy, dz]
-            tmp(0) = it.timeStamp_;
-            tmp.segment(1, 3) = it.dPos_;        
-        }
+    }
+    else{
+        int cnt = 0;
+        double t2 = cmnsData[cnt].timeStamp_;
+        for(auto it : virnsData){
+            VecXd tmp;
+            double t1 = it.timeStamp_;
+            if(abs(t1 - t2) < 1e-5){
+                tmp = VecXd::Zero(7); // [t, dx, dy, dz, L, l, h]
+                tmp(0) = it.timeStamp_;
+                tmp.segment(1, 3) = it.dPos_;
+                tmp.segment(4, 2) = cmnsData[cnt].pos_; 
+                tmp(6) = altData[cnt].range_;
+                cnt++;
 
-        allZ.push(tmp);
+                t2 = cmnsData[cnt].timeStamp_;
+            }
+            else{
+                tmp = VecXd::Zero(4); // [t, dx, dy, dz]
+                tmp(0) = it.timeStamp_;
+                tmp.segment(1, 3) = it.dPos_;
+            }
+            allZ.push(tmp);
+        }
     }
 }
 
@@ -114,15 +129,14 @@ void Estimator::processBackend(double time){
 
     // initiate filter
     if(sigmaType_ == SP_UKF){
-        filterPtr_ = new PdSCSPKF(Mu0_, Sigma0_, Q0_, R0_, UKF_A, UKF_B, UKF_K);
+        filterPtr_ = new PdSCSPKF(Mu0_, Sigma0_, Q0_, R0_, UKF_A, UKF_B, UKF_K); // create SCSPKF pointer
     }
     else{
-        filterPtr_ = new PdSCSPKF(Mu0_, Sigma0_, Q0_, R0_, sigmaType_);
+        filterPtr_ = new PdSCSPKF(Mu0_, Sigma0_, Q0_, R0_, sigmaType_); // create SCSPKF pointer
     }
-
+    filterPtr_->setUpdateType(updateType_);
     filterPtr_->setQnb(trajData_[0].qnb_);
     cout << "Sigma Type: " << filterPtr_->getSigmaType() << endl;
-    // create SCSPKF pointer
     // start estimation
     for (size_t i = 0; i < dataSize_ - 1; i++){
         // ------------ prediction ------------//
@@ -135,9 +149,29 @@ void Estimator::processBackend(double time){
         double timeStamp = allU_.front()(0);
         if(abs(allZ_.front()(0) - timeStamp) < 1e-5){
             int tmpSize = allZ_.front().size() - 1;
-            tmp = allZ_.front().segment(1, tmpSize);
+
+            if(updateType_ == 1){
+                // A + A
+                tmp = VecXd::Zero(tmpSize);
+                lastZA_ += allZ_.front().segment(1, sizeMr_);
+                if(tmpSize == sizeMr_){
+                    tmp = lastZA_;
+                }
+                else{
+                    tmp.segment(0, sizeMr_) = lastZA_;
+                    tmp.segment(sizeMr_, sizeMa_) = allZ_.front().tail(sizeMa_);
+                }
+            }
+            else{
+                // A + R
+                tmp = allZ_.front().segment(1, tmpSize);
+            }
+
             filterPtr_->oneStepUpdate(tmp);
             allZ_.pop();
+
+            if(tmpSize != sizeMr_)
+                lastZA_ = FrameConvert::geo2mcmf(filterPtr_->getMu().head(3));
         }
         // ---------- save results ----------//
         allMu_.emplace_back(make_pair(timeStamp, filterPtr_->getMu()));        

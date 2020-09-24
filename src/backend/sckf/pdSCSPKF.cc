@@ -61,36 +61,82 @@ void PdSCSPKF::updateFcn(vector<VecXd> &sPointsX, vector<VecXd> &sPointsY){
     if(sPointsY.size() != 0)
         sPointsY.clear();
     
-    VecXd lastP = VecXd::Zero(3);
     VecXd curP = VecXd::Zero(3);
-    double preLat, preAlt, preLon;
     double curLat, curAlt, curLon;
 
-    for (auto it: sPointsX){
-        preLat = it(0); preAlt = it(1); preLon = it(2);
-        curLat = it(6); curAlt = it(7); curLon = it(8);
+    switch (updateType_)
+    {
+    case 0:
+    {
+        for (auto it: sPointsX){
+            // [L, l, h]
+            curLat = it(0); curAlt = it(1); curLon = it(2);
+            VecXd tmp = VecXd::Zero(curMSize_);
+            tmp.segment(0, 2) = Vec2d(curLat, curLon);
+            tmp(2) = curAlt / qnb_.toRotationMatrix()(1, 1);
 
-        lastP.x() = (R_m + preAlt) * cos(preLat) * cos(preLon);
-        lastP.y() = (R_m + preAlt) * cos(preLat) * sin(preLon);
-        lastP.z() = (R_m + preAlt) * sin(preLat);
+            sPointsY_.emplace_back(tmp);
+        }
+        break;
+    }
+    case 1:
+    {
+        for (auto it: sPointsX){
+            curLat = it(0); curAlt = it(1); curLon = it(2);
     
-        curP.x() = (R_m + curAlt) * cos(curLat) * cos(curLon);
-        curP.y() = (R_m + curAlt) * cos(curLat) * sin(curLon);
-        curP.z() = (R_m + curAlt) * sin(curLat);
+            curP.x() = (R_m + curAlt) * cos(curLat) * cos(curLon);
+            curP.y() = (R_m + curAlt) * cos(curLat) * sin(curLon);
+            curP.z() = (R_m + curAlt) * sin(curLat);
 
-        VecXd tmp = VecXd::Zero(curMSize_);
-        if(curMSize_ == mSize_){
-            // [dx,dy,dz,L,l,h]
-            tmp.segment(0, 3) = curP - lastP;
-            tmp.segment(3, 2) = Vec2d(curLat, curLon);
-            tmp(5) = curAlt / qnb_.toRotationMatrix()(1, 1);
+            VecXd tmp = VecXd::Zero(curMSize_);
+            if(curMSize_ == mSize_){
+                // [dx,dy,dz,L,l,h]
+                tmp.segment(0, 3) = curP;
+                tmp.segment(3, 2) = Vec2d(curLat, curLon);
+                tmp(5) = curAlt / qnb_.toRotationMatrix()(1, 1);
+            }
+            else{
+                // [dx dy dz]
+                tmp = curP;
+            }
+            sPointsY_.emplace_back(tmp);
         }
-        else{
-            // [dx dy dz]
-            tmp = curP - lastP;
-        }
+        break;
+    }
+    case 2:
+    {
+        VecXd lastP = VecXd::Zero(3);
+        double preLat, preAlt, preLon;
+        for (auto it: sPointsX){
+            preLat = it(0); preAlt = it(1); preLon = it(2);
+            curLat = it(6); curAlt = it(7); curLon = it(8);
 
-        sPointsY_.emplace_back(tmp);
+            lastP.x() = (R_m + preAlt) * cos(preLat) * cos(preLon);
+            lastP.y() = (R_m + preAlt) * cos(preLat) * sin(preLon);
+            lastP.z() = (R_m + preAlt) * sin(preLat);
+    
+            curP.x() = (R_m + curAlt) * cos(curLat) * cos(curLon);
+            curP.y() = (R_m + curAlt) * cos(curLat) * sin(curLon);
+            curP.z() = (R_m + curAlt) * sin(curLat);
+
+            VecXd tmp = VecXd::Zero(curMSize_);
+            if(curMSize_ == mSize_){
+                // [dx,dy,dz,L,l,h]
+                tmp.segment(0, 3) = curP - lastP;
+                tmp.segment(3, 2) = Vec2d(curLat, curLon);
+                tmp(5) = curAlt / qnb_.toRotationMatrix()(1, 1);
+            }
+            else{
+                // [dx dy dz]
+                tmp = curP - lastP;
+            }
+            sPointsY_.emplace_back(tmp);
+        }
+        break;
+    }
+    default:
+        cout << "[E] Error update type\n.";
+        return;
     }
 }
     

@@ -2,7 +2,7 @@
 
 # ### IMU parameters (iMAR-FSLG-1)
 imu_frequency: 200 # frequency
-imu_step: 0.005 # time_step
+imu_step: 0.01 # time_step
 acc_b: 2.943e-3 # initial bias of acc (m/s^2)  = 0.3 mg
 acc_n: 3.924e-4 # accelerometer noise standard deviation/density (m/s^2) * (1/sqrt(Hz))
 acc_w: 3.924e-5 # accelerometer bias random walker standard deviation (m/s^3) * (1/sqrt(Hz))
@@ -31,15 +31,15 @@ gyr_w: 1.309e-7 # gyroscope bias random walker standard deviation (rad/s^2) * (1
 cns_step: 0.1 # 10Hz
 cns_n: 9 # arcsec
 ### VIRNS parameters
-virns_step: 0.1 # 10Hz 
-virns_b: 100 # bias of initial position
-virns_n: 15 # noise of position
+virns_step: 0.05 # 20Hz 
+virns_b: 0 # bias of initial position
+virns_n: 10 # noise of position
 ### CMNS parameters
-cmns_step: 5 # 1s
+cmns_step: 0.5 # 1s
 cmns_n : 5 # noise of absolute
 ### Altimeter parameters
-alt_step: 5
-alt_n : 1
+alt_step: 0.5
+alt_n : 5
 
 
 

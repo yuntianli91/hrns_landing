@@ -300,42 +300,76 @@ void SCSPKF::oneStepPrediction(VecXd &U){
 
 void SCSPKF::oneStepUpdate(VecXd &Z){
     curMSize_ = Z.size();
-    curR_ = R_.block(0, 0, curMSize_, curMSize_); // switch R
-    // augmented mean and covariance
-    augMu_ = VecXd::Zero(2 * xSize_);
-    augSigma_ = MatXd::Zero(2 * xSize_, 2 * xSize_);
-
-    augMu_.segment(0, xSize_) = lastMu_;
-    augMu_.segment(xSize_, xSize_) = Mu_;
-
-    augSigma_.block(0, 0, xSize_, xSize_) = lastSigma_;
-    augSigma_.block(0, xSize_, xSize_, xSize_) = lastSigma_ * Phi_.transpose();
-    augSigma_.block(xSize_, 0, xSize_, xSize_) = Phi_ * lastSigma_;
-    augSigma_.block(xSize_, xSize_, xSize_, xSize_) = Sigma_;
+    // switch R
+    if(updateType_ != 0){
+        curR_ = R_.block(0, 0, curMSize_, curMSize_);
+    }
+    else{
+        curR_ = R_.bottomRightCorner(curMSize_, curMSize_); 
+    }
+    // cout << "curR: \n" << curR_ << endl;
     // clear container
     sPointsX_.clear();
     sPointsY_.clear();
+ 
+    if(updateType_ == 2){
+        augMu_ = VecXd::Zero(2 * xSize_);
+        augSigma_ = MatXd::Zero(2 * xSize_, 2 * xSize_);
 
-    // cout << "augSigma_:\n" << augSigma_ << endl; 
-    // generate sigma points
-    genSigmaPoints(sPointsX_, true);
-    // propagate sigma points
-    updateFcn(sPointsX_, sPointsY_);
-    VecXd tmpZ = calcWeightedMean(sPointsY_, weightMuAug_);
-    MatXd SigmaZZ = calcWeightedCov(sPointsY_, weightMuAug_, weightSigmaAug_) + curR_;
-    // cout << "ZZ:\n" << SigmaZZ << endl;
-    MatXd SigmaXZ = calcWeightedCrossCov(sPointsX_, sPointsY_, weightMuAug_, weightSigmaAug_);
-    // cout << "XZ:\n" << SigmaXZ << endl;
-    // compute Kalman gain
-    MatXd K = SigmaXZ * SigmaZZ.inverse();
-    // cout << "K:\n" << K << endl;
-    residual_ = Z - tmpZ;
-    // update augment state and covariance
-    augMu_ += K * residual_;
-    augSigma_ -= K * SigmaZZ * K.transpose();
-    // margliza old state
-    Mu_ = augMu_.segment(xSize_, xSize_);
-    Sigma_ = augSigma_.block(xSize_, xSize_, xSize_, xSize_);
+        augMu_.segment(0, xSize_) = lastMu_;
+        augMu_.segment(xSize_, xSize_) = Mu_;
+
+        augSigma_.block(0, 0, xSize_, xSize_) = lastSigma_;
+        augSigma_.block(0, xSize_, xSize_, xSize_) = lastSigma_ * Phi_.transpose();
+        augSigma_.block(xSize_, 0, xSize_, xSize_) = Phi_ * lastSigma_;
+        augSigma_.block(xSize_, xSize_, xSize_, xSize_) = Sigma_;
+
+        // cout << "augSigma_:\n" << augSigma_ << endl; 
+        // generate sigma points
+        genSigmaPoints(sPointsX_, true);
+        // propagate sigma points
+        updateFcn(sPointsX_, sPointsY_);
+        VecXd tmpZ = calcWeightedMean(sPointsY_, weightMuAug_);
+        MatXd SigmaZZ = calcWeightedCov(sPointsY_, weightMuAug_, weightSigmaAug_) + curR_;
+        // cout << "ZZ:\n" << SigmaZZ << endl;
+        MatXd SigmaXZ = calcWeightedCrossCov(sPointsX_, sPointsY_, weightMuAug_, weightSigmaAug_);
+        // cout << "XZ:\n" << SigmaXZ << endl;
+        // compute Kalman gain
+        MatXd K = SigmaXZ * SigmaZZ.inverse();
+        // cout << "K:\n" << K << endl;
+        residual_ = Z - tmpZ;
+        // update augment state and covariance
+        augMu_ += K * residual_;
+        augSigma_ -= K * SigmaZZ * K.transpose();
+        // margliza old state
+        Mu_ = augMu_.segment(xSize_, xSize_);
+        Sigma_ = augSigma_.block(xSize_, xSize_, xSize_, xSize_);
+    }
+    else{
+        augMu_ = Mu_;
+        augSigma_ = Sigma_;     
+        // cout << "augSigma_:\n" << augSigma_ << endl; 
+        // generate sigma points
+        genSigmaPoints(sPointsX_);
+        // propagate sigma points
+        updateFcn(sPointsX_, sPointsY_);
+        VecXd tmpZ = calcWeightedMean(sPointsY_, weightMu_);
+        MatXd SigmaZZ = calcWeightedCov(sPointsY_, weightMu_, weightSigma_) + curR_;
+        // cout << "ZZ:\n" << SigmaZZ << endl;
+        MatXd SigmaXZ = calcWeightedCrossCov(sPointsX_, sPointsY_, weightMu_, weightSigma_);
+        // cout << "XZ:\n" << SigmaXZ << endl;
+        // compute Kalman gain
+        MatXd K = SigmaXZ * SigmaZZ.inverse();
+        // cout << "K:\n" << K << endl;
+        residual_ = Z - tmpZ;
+        // update augment state and covariance
+        augMu_ += K * residual_;
+        augSigma_ -= K * SigmaZZ * K.transpose();
+        // margliza old state
+        Mu_ = augMu_;
+        Sigma_ = augSigma_;
+    }
+  
     // reset state
     lastMu_ = Mu_;
     lastSigma_ = Sigma_;
