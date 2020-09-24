@@ -63,6 +63,8 @@ protected:
     SampleType sigmaType_;
     PdSCSPKF *filterPtr_; // pointer of filter
 
+    bool flagSC_ = 1; // flag of stochastic cloning
+
     string outFile_;
 };
     

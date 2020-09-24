@@ -42,6 +42,7 @@ protected:
     int curMSize_; // current measurement size
 
     bool flagInitialized_ = false;
+    bool flagSC_ = true;
 };
 
 } // namespace MyFusion
