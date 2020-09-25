@@ -10,6 +10,8 @@ namespace plt = matplotlibcpp;
 vector<ImuMotionData> trajData; 
 
 int main(int argc, char** argv){
+    printf("\n#################### SC-Fusion Start ###################\n");
+   
     readImuMotionData("../data/stdTraj/caGeo.csv", trajData);
 
     float simTime(0);
@@ -50,6 +52,7 @@ int main(int argc, char** argv){
 
     // myEstimator.showResults(); 
 
+    printf("#################### SC-Fusion Start ###################\n");
     // ---------- plot figure ---------- //
     return 0;
 }

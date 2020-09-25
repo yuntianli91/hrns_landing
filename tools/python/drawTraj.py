@@ -74,8 +74,8 @@ labels = ['trajectory','IMU']
 # labels = ['标称轨迹','IMU轨迹']
 colors = ['tab:blue','tab:red']
 ###### figure1 #####
-fig1, axes = plt.subplots(3, 1,figsize=(6,4))
-fig1.subplots_adjust(hspace=0.7)
+fig1, axes = plt.subplots(3, 1,figsize=(7,5))
+fig1.subplots_adjust(hspace=0.5)
 ## 子图1
 # axes[0].plot(time_series, acc[:,0], color=colors[0], lw=2)
 # axes[0].plot(time_series, acc_imu[:,0], color=colors[1])
@@ -124,8 +124,8 @@ axes[2].grid()
 
 fig1.savefig('acc.pdf', format='pdf')
 # ##### figure2 #####
-fig2, axes = plt.subplots(3, 1,figsize=(6,4))
-fig2.subplots_adjust(hspace=0.7)
+fig2, axes = plt.subplots(3, 1,figsize=(7,5))
+fig2.subplots_adjust(hspace=0.5)
 ## 子图1
 # axes[0].plot(time_series, gyr[:,0], color=colors[0], lw=2)
 # axes[0].plot(time_series, gyr_imu[:,0], color=colors[1])
@@ -174,8 +174,8 @@ axes[2].grid()
 
 fig2.savefig('gyr.pdf', format='pdf')
 ##### figure3 #####
-fig3, axes = plt.subplots(3, 1,figsize=(6,4))
-fig3.subplots_adjust(hspace=0.7)
+fig3, axes = plt.subplots(3, 1,figsize=(7,5))
+fig3.subplots_adjust(hspace=0.5)
 pos[:,0]  = pos[:,0] / math.pi * 180. # latitude
 pos[:,1] = pos[:,1] / 1000. # altitude
 pos[:,2]  = pos[:,2] / math.pi * 180. # longitude
@@ -232,8 +232,8 @@ axes[2].grid()
 fig3.savefig('pos.pdf', format='pdf')
 
 ##### figure4 #####
-fig4, axes = plt.subplots(3, 1,figsize=(6,4))
-fig4.subplots_adjust(hspace=0.7)
+fig4, axes = plt.subplots(3, 1,figsize=(7,5))
+fig4.subplots_adjust(hspace=0.5)
 
 ## 子图1
 axes[0].plot(time_series, vel[:,0], color=colors[0], lw=2)
@@ -280,8 +280,8 @@ axes[2].grid()
 
 fig4.savefig('vel.pdf', format='pdf')
 ##### figure5 #####
-fig5, axes = plt.subplots(3, 1,figsize=(6,4))
-fig5.subplots_adjust(hspace=0.7)
+fig5, axes = plt.subplots(3, 1,figsize=(7,5))
+fig5.subplots_adjust(hspace=0.5)
 ## 子图1
 axes[0].plot(time_series, euler[:,0], color=colors[0], lw=2)
 axes[0].plot(time_imu, euler_imu[:,0], color=colors[1], lw=2)
@@ -327,7 +327,7 @@ axes[2].grid()
 
 fig5.savefig('att.pdf', format='pdf')
 # ##### figure6 #####
-fig6, axis = plt.subplots(1,1,figsize=(6,4))
+fig6, axis = plt.subplots(1,1,figsize=(7,5))
 
 axis.plot(ned_data[:,3], ned_data[:,1], color=colors[0], lw=2)
 axis.plot(ned_data_imu[:,3], ned_data_imu[:,1], color=colors[1])
@@ -340,7 +340,7 @@ axis.set_ylabel("North(km)")
 
 # fig6.savefig('ne.pdf', format='pdf')
 # ##### figure7 ######
-fig7, axis = plt.subplots(1,1, figsize=(6,4))
+fig7, axis = plt.subplots(1,1, figsize=(7,5))
 axis.plot(downRange, pos[:,1], color=colors[0], lw=2)
 axis.plot(downRangeImu, pos_imu[:,1], color=colors[1])
 # axis.set_xlabel("航向(km)")
