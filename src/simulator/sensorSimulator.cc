@@ -49,14 +49,14 @@ void SensorSimulator::showParameters(SensorParams params){
     printf("  ACC_B:%e, ACC_N:%e, ACC_W:%e.\n", params.acc_b_, params.acc_n_, params.acc_w_);
     printf("  GYR_B:%e, GYR_N:%e, GYR_W:%e.\n", params.gyr_b_, params.gyr_n_, params.gyr_w_);
 
-    printf("[0] CNS Parameters(%lf):\n", params.cns_step_);
-    printf("  Noise:%lf.\n", params.cns_sigma_);
+    // printf("[0] CNS Parameters(%lf):\n", params.cns_step_);
+    // printf("  Noise:%lf.\n", params.cns_sigma_);
 
-    printf("[0] VIRNS Parameters(%lf):\n", params.virns_step_);
-    printf("  Bias:%lf, Noise:%lf.\n", params.virns_bias_, params.virns_sigma_);
+    // printf("[0] VIRNS Parameters(%lf):\n", params.virns_step_);
+    // printf("  Bias:%lf, Noise:%lf.\n", params.virns_bias_, params.virns_sigma_);
 
-    printf("[0] CMNS Parameters(%lf):\n", params.cmns_step_);
-    printf("  Noise:%lf.\n", params.cmns_sigma_);
+    // printf("[0] CMNS Parameters(%lf):\n", params.cmns_step_);
+    // printf("  Noise:%lf.\n", params.cmns_sigma_);
 }
 
 void SensorSimulator::simIMU(const vector<ImuMotionData> &trajData, vector<ImuMotionData> &imuData){
@@ -126,6 +126,8 @@ void SensorSimulator::simVIRNSRelative(const vector<ImuMotionData> &trajData, ve
 }
 
 void SensorSimulator::simVIRNS(const vector<ImuMotionData> &trajData, vector<VirnsData> &virnsData){
+    printf("[0] VIRNS Parameters(%lf):\n", sensorParams_.virns_step_);
+    printf("  Bias:%lf, Noise:%lf.\n", sensorParams_.virns_bias_, sensorParams_.virns_sigma_);
     // generate relative measurements
     simVIRNSRelative(trajData, virnsData);
     // generate absolute measurements
@@ -145,6 +147,9 @@ void SensorSimulator::simVIRNS(const vector<ImuMotionData> &trajData, vector<Vir
 }
 
 void SensorSimulator::simCMNS(const vector<ImuMotionData> &trajData, vector<CmnsData> &cmnsData){
+    printf("[0] CMNS Parameters(%lf):\n", sensorParams_.cmns_step_);
+    printf("  Noise:%lf.\n", sensorParams_.cmns_sigma_);
+
     CMNS cmnsSimulator(0., sensorParams_.cmns_sigma_);
 
     cmnsData.clear();
