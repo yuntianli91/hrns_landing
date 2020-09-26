@@ -83,8 +83,8 @@ def calcRMSE(err, dim):
 #################### 读取数据（csv格式） ########################
 trajData = pd.read_csv('../data/stdTraj/caGeo.csv')
 imuData = pd.read_csv('../data/sensorSimData/imuData.csv')
-filter1Data = pd.read_csv('../output/diffPeriod/AA0.csv')
-filter2Data = pd.read_csv('../output/diffPeriod/AR0.csv')
+filter1Data = pd.read_csv('../output/ckfAA.csv')
+filter2Data = pd.read_csv('../output/ckfAR.csv')
 
 errFilter1 = calcError(trajData, filter1Data)
 errFilter2 = calcError(trajData, filter2Data)
